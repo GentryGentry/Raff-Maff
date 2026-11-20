@@ -11,11 +11,21 @@ const LESSON = process.argv[3] ?? "w2-l3";
   await page.goto(`http://localhost:3000/lektion/${LESSON}?steg=10`);
   await page.waitForSelector("text=Skriftlig metod");
   await page.locator("div.card", { hasText: "Skriftlig metod" }).getByRole("button").first().click();
-  await page.waitForSelector("text=Ställ upp och räkna");
+  await page.waitForSelector("text=/Ställ upp och räkna|liggande stolen/");
   const p = JSON.parse(Buffer.from(token.split(".")[0], "base64url").toString());
   const ex = generateAssessment(p.l, p.k, p.s);
   for (let i = 0; i < ex.length; i++) {
     const s = ex[i].solution as any;
+    if (s.kind === "longdiv") {
+      for (let k = 0; k < s.q.length; k++) {
+        await page.getByLabel(`kvotsiffra ${k + 1}`, { exact: true }).fill(s.q[k]);
+        await page.getByLabel(`produkt ${k + 1}`, { exact: true }).fill(s.prod[k]);
+        await page.getByLabel(`rest ${k + 1}`, { exact: true }).fill(s.rem[k]);
+      }
+      if (i === 0) await page.screenshot({ path: OUT + "/longdiv-filled.png" });
+      await page.getByRole("button", { name: i < ex.length - 1 ? "Nästa" : "Lämna in", exact: true }).click();
+      continue;
+    }
     // carries
     for (let c = 0; c < s.carries.length; c++) if (s.carries[c]) await page.getByLabel(new RegExp(`(minnessiffra|växling) kolumn ${c + 1}$`)).fill(s.carries[c]);
     // partial products (multiplication), digits right-aligned
@@ -30,7 +40,7 @@ const LESSON = process.argv[3] ?? "w2-l3";
     await page.getByRole("button", { name: i < ex.length - 1 ? "Nästa" : "Lämna in", exact: true }).click();
   }
   await page.waitForSelector("text=Godkänt!");
-  const full = await page.locator("text=Rätt svar och rätt skriftlig metod!").count();
+  const full = await page.locator("text=/Rätt svar och rätt skriftlig metod!|Rätt kvot och rätt delsteg/").count();
   console.log("PASS column UI flow (" + LESSON + "); items with full marks:", full, "of", ex.length);
   await page.screenshot({ path: OUT + "/column-result.png" });
   await b.close();

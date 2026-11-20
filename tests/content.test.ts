@@ -3,7 +3,7 @@ import { ALL_LESSONS, WORLDS } from "@/lib/content";
 import { generateAssessment, gradeSet } from "@/lib/engine/assessment";
 import { gradeExercise, perfectAnswer } from "@/lib/engine/grading";
 import { makeRng } from "@/lib/engine/rng";
-import { columnSolution } from "@/lib/engine/gen-helpers";
+import { columnSolution, longdivSolution, longdivEx } from "@/lib/engine/gen-helpers";
 import type { ConcreteExercise, Template } from "@/lib/engine/types";
 
 const SEEDS = 150;
@@ -132,5 +132,30 @@ describe("roman numerals", () => {
     expect(toRoman(1994)).toBe("MCMXCIV");
     expect(toRoman(49)).toBe("XLIX");
     expect(toRoman(4)).toBe("IV");
+  });
+});
+
+describe("long division (liggande stolen)", () => {
+  it("solves digit by digit", () => {
+    expect(longdivSolution(534, 3)).toMatchObject({ q: ["1", "7", "8"], prod: ["3", "21", "24"], rem: ["2", "2", "0"], quotient: 178, remainder: 0 });
+    expect(longdivSolution(749, 4)).toMatchObject({ q: ["1", "8", "7"], prod: ["4", "32", "28"], rem: ["3", "2", "1"], quotient: 187, remainder: 1 });
+    expect(longdivSolution(138, 6)).toMatchObject({ q: ["2", "3"], prod: ["12", "18"], rem: ["1", "0"], p0: 1 });
+  });
+  it("quotient digits always equal floor(a/b) and remainders are < b (exhaustive)", () => {
+    for (let b = 2; b <= 9; b++) for (let a = b; a <= 9999; a += 7) {
+      const s = longdivSolution(a, b);
+      expect(Number(s.q.join(""))).toBe(Math.floor(a / b));
+      expect(Number(s.rem[s.rem.length - 1])).toBe(a % b);
+      s.rem.forEach((r) => expect(Number(r)).toBeLessThan(b));
+    }
+  });
+  it("grades result and method separately", () => {
+    const ex = longdivEx("t", "s", 749, 4, "", []);
+    const full = gradeExercise(ex, perfectAnswer(ex));
+    expect(full.points).toBe(2);
+    const noSteps = gradeExercise(ex, { kind: "longdiv", q: ["1", "8", "7"], prod: ["", "", ""], rem: ["", "", "1"] });
+    expect(noSteps.points).toBe(1); expect(noSteps.methodOk).toBe(false);
+    const wrongQ = gradeExercise(ex, { kind: "longdiv", q: ["1", "8", "6"], prod: ["4", "32", "28"], rem: ["3", "2", "1"] });
+    expect(wrongQ.points).toBe(1);
   });
 });

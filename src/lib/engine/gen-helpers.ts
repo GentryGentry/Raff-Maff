@@ -179,3 +179,33 @@ export function withVisual(ex: ConcreteExercise, visual: import("./types").Visua
   }
   return ex;
 }
+
+// ---------- long division (liggande stolen) ----------
+
+/** Digit-by-digit bus-stop division. Starts at the first prefix of `a` that is >= b. */
+export function longdivSolution(a: number, b: number) {
+  const ds = String(a).split("").map(Number);
+  let p0 = 0;
+  let cur = ds[0];
+  while (cur < b && p0 < ds.length - 1) { p0++; cur = cur * 10 + ds[p0]; }
+  const q: string[] = [], prod: string[] = [], rem: string[] = [];
+  let r = 0;
+  for (let i = p0; i < ds.length; i++) {
+    if (i > p0) cur = r * 10 + ds[i];
+    const qd = Math.floor(cur / b);
+    q.push(String(qd)); prod.push(String(qd * b));
+    r = cur - qd * b; rem.push(String(r));
+  }
+  return { q, prod, rem, p0, quotient: Math.floor(a / b), remainder: a % b };
+}
+
+export function longdivEx(
+  id: string, skill: string, a: number, b: number, explanation: string, hints: string[], prompt?: string,
+): ConcreteExercise {
+  const s = longdivSolution(a, b);
+  return {
+    spec: { kind: "longdiv", id, skill, a, b, p0: s.p0, prompt: prompt ?? `Räkna ${a} ÷ ${b} med liggande stolen. Skriv kvotsiffra, produkt och rest i varje steg.` },
+    solution: { kind: "longdiv", q: s.q, prod: s.prod, rem: s.rem, quotient: s.quotient, remainder: s.remainder },
+    explanation, hints,
+  };
+}

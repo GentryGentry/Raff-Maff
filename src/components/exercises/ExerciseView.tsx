@@ -17,6 +17,7 @@ export function emptyAnswer(spec: ExerciseSpec): Answer {
     case "numberline": return { kind: "numberline", value: null };
     case "fractionbar": return { kind: "fractionbar", value: 0 };
     case "areamodel": return { kind: "areamodel", cells: [], total: "" };
+    case "longdiv": return { kind: "longdiv", q: [], prod: [], rem: [] };
     case "multifield": return { kind: "multifield", values: spec.fields.map(() => "") };
     case "text": return { kind: "text", value: "" };
   }
@@ -30,6 +31,7 @@ export function isAnswered(spec: ExerciseSpec, a: Answer | undefined): boolean {
     case "column": return a.result.trim() !== "";
     case "fractionbar": return a.value > 0;
     case "areamodel": return a.total.trim() !== "";
+    case "longdiv": return a.q.some((x) => (x ?? "").trim() !== "");
     case "multifield": return a.values.some((v) => v.trim() !== "");
     case "text": return spec.kind === "text" ? a.value.trim().length > 0 : false;
   }
@@ -149,6 +151,39 @@ function NumberLineInput({ spec, value, onChange, disabled }: ExProps & { spec: 
   );
 }
 
+/* ───────── long division ───────── */
+function LongDivInput({ spec, value, onChange, disabled }: ExProps & { spec: Extract<ExerciseSpec, { kind: "longdiv" }> }) {
+  const a = value?.kind === "longdiv" ? value : { kind: "longdiv" as const, q: [], prod: [], rem: [] };
+  const ds = String(spec.a).split("");
+  const steps = ds.length - spec.p0;
+  const set = (key: "q" | "prod" | "rem", i: number, v: string, max: number) => {
+    const arr = [...a[key]]; while (arr.length <= i) arr.push("");
+    arr[i] = v.replace(/\D/g, "").slice(0, max);
+    onChange({ ...a, [key]: arr });
+  };
+  const cell = "h-11 w-full rounded-lg border border-[#223660] bg-[#070d1c] text-center text-lg font-semibold text-white focus:border-[#e8b64a] focus:outline-none";
+  return (
+    <div className="space-y-3 rounded-2xl border border-[#223660] bg-[#0b1428] p-3">
+      <div className="flex items-center justify-center gap-3 text-3xl font-semibold" aria-label={`${spec.a} delat med ${spec.b}`}>
+        <span>{spec.b}</span><span className="text-[#e8b64a]">)</span>
+        <span className="tracking-widest">{ds.map((d, i) => <span key={i} className={i <= spec.p0 ? "text-white" : "text-[#8d99b3]"}>{d}</span>)}</span>
+      </div>
+      <p className="text-center text-xs text-[#8d99b3]">Skriv i varje steg: kvotsiffra, produkt (kvotsiffra · {spec.b}) och rest.</p>
+      {Array.from({ length: steps }, (_, i) => (
+        <div key={i} className="rounded-xl bg-[#111d38] p-3">
+          <div className="mb-2 text-sm text-[#c3cce0]">Steg {i + 1}: {i === 0 ? <>Börja med talet <strong>{String(spec.a).slice(0, spec.p0 + 1)}</strong></> : <>Ta ner siffran <strong>{ds[spec.p0 + i]}</strong></>}</div>
+          <div className="grid grid-cols-3 gap-2 text-[11px] text-[#8d99b3]">
+            <label>Kvotsiffra<input className={cell} inputMode="numeric" disabled={disabled} aria-label={`kvotsiffra ${i + 1}`} value={a.q[i] ?? ""} onChange={(e) => set("q", i, e.target.value, 1)} /></label>
+            <label>Produkt<input className={cell} inputMode="numeric" disabled={disabled} aria-label={`produkt ${i + 1}`} value={a.prod[i] ?? ""} onChange={(e) => set("prod", i, e.target.value, 4)} /></label>
+            <label>Rest<input className={cell} inputMode="numeric" disabled={disabled} aria-label={`rest ${i + 1}`} value={a.rem[i] ?? ""} onChange={(e) => set("rem", i, e.target.value, 4)} /></label>
+          </div>
+        </div>
+      ))}
+      <div className="text-center text-sm text-[#c3cce0]">Kvot: <strong className="text-lg text-[#f3d58a]">{a.q.slice(0, steps).map((x) => x || "_").join("")}</strong>{(a.rem[steps - 1] ?? "") !== "" && a.rem[steps - 1] !== "0" ? <> rest <strong>{a.rem[steps - 1]}</strong></> : null}</div>
+    </div>
+  );
+}
+
 /* ───────── area model ───────── */
 function AreaInput({ spec, value, onChange, disabled }: ExProps & { spec: Extract<ExerciseSpec, { kind: "areamodel" }> }) {
   const a = value?.kind === "areamodel" ? value : { kind: "areamodel" as const, cells: [], total: "" };
@@ -218,6 +253,7 @@ export function ExerciseView({ spec, value, onChange, disabled }: ExProps) {
       {spec.kind === "column" && <ColumnInput {...props} spec={spec} />}
       {spec.kind === "numberline" && <NumberLineInput {...props} spec={spec} />}
       {spec.kind === "areamodel" && <AreaInput {...props} spec={spec} />}
+      {spec.kind === "longdiv" && <LongDivInput {...props} spec={spec} />}
       {spec.kind === "fractionbar" && (
         <div className="space-y-2">
           <FractionBarV parts={spec.parts} shaded={value?.kind === "fractionbar" ? value.value : 0} onToggle={disabled ? undefined : (i) => onChange({ kind: "fractionbar", value: value?.kind === "fractionbar" && value.value === i + 1 ? i : i + 1 })} />

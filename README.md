@@ -68,7 +68,7 @@ Mastery får **inte** bero på XP eller på klientens påståenden.
   redan klarat kriterierna (t.ex. vid matematiska fel) – aldrig godkänna.
 
 Skriftlig metod bedöms strukturerat: i uppställning bedöms minnessiffror (addition), växlingar (subtraktion) och
-delprodukter (multiplikation) **separat** från svaret (1 poäng vardera); i areamodellen bedöms delprodukterna separat
+delprodukter (multiplikation) samt kvotsiffra/produkt/rest i varje steg av liggande stolen (division) **separat** från svaret (1 poäng vardera); i areamodellen bedöms delprodukterna separat
 från summan. Frihandsritningen i Räkneyta är ett övningsverktyg och bedöms **inte** automatiskt – representation
 bedöms genom strukturerade modelluppgifter (tallinje, basblock, areamodell, del–helhet).
 
@@ -81,7 +81,7 @@ fel → tillbaka till 1 dag), (2) underkända kunskapsprov, (3) svaga färdighet
 ## Test
 
 ```bash
-npm test                              # enhetstester: ~190 tester – alla generatorer × 150 frön × 3 nivåer, bedömning, tröskelvärden
+npm test                              # enhetstester: ~260 tester – alla generatorer × 150 frön × 3 nivåer, bedömning, tröskelvärden
 npm run dev                           # i en terminal
 npx tsx scripts/api-e2e.ts            # mot körande dev-server: upplåsning, replay/förfalskning, XP, hela genomspelet av alla byggda världar
 npx tsx scripts/ui-column.ts <mapp>   # styr riktiga UI:t (iPhone-emulering) och löser en uppställningsuppgift
@@ -110,7 +110,7 @@ public/sw.js          Service worker
 
 **Byggt och testat**
 - Hela appskalet (Hem, Världskarta, Lärarakademin, Repetition, Profil, Räkneyta, AI-handledare, inloggning).
-- **Värld 1 (9 lektioner), Värld 2 (7) och Värld 3 – Multiplikation (6)** med alla 11 lektionssteg, genererade uppgifter,
+- **Värld 1 (9 lektioner), Värld 2 (7) och Värld 3 – Multiplikation (6) och Värld 4 – Division (7)** med alla 11 lektionssteg, genererade uppgifter,
   fyrdelad slutbedömning, lärarutmaningar med elevfall, och bossutmaningar.
 - Server-side rättning, upplåsning, XP/nivåer/streak, 13 märken, mastery, repetition – genomspelade i `api-e2e`.
 - Strukturerad uppställning (minnessiffror/växling/delprodukter), areamodell, tallinje, bråkstapel, Konva-rityta.
@@ -124,9 +124,9 @@ public/sw.js          Service worker
   Offline fungerar för sidor som besökts tidigare; prov kräver alltid internet.
 
 **Inte byggt**
-- **Världarna 4–13** finns på kartan som planerade (🚧) men har **inget innehåll**. De går inte att öppna och ger
+- **Världarna 5–13** finns på kartan som planerade (🚧) men har **inget innehåll**. De går inte att öppna och ger
   inga framsteg. Se `docs/lgr22-mapping.md` för vad som återstår. Innehållsmodellen är gjord för att fler lektioner
-  läggs till som TypeScript-filer i `src/lib/content/` (se `w2/` och `w3/` som mall).
+  läggs till som TypeScript-filer i `src/lib/content/` (se `w2/`–`w4/` som mall).
 - Frihandsritning bedöms inte automatiskt (se ovan).
 - Programmering/algoritmer (står i Lgr22) saknas bland de 13 världarna.
 - Lärarförklaringar bedöms med en regelbaserad rubrik (begrepp + minimilängd + skydd mot nyckelordsfyllning) och, med

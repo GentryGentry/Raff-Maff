@@ -14,9 +14,9 @@ Status: ✅ byggd lektion · 🚧 planerad (värld finns på kartan men saknar i
 | Olika talsystem och några talsystem som används i olika kulturer genom historien | V1 L9 (romerska siffror, babyloniskt/egyptiskt/indiskt) | ✅ |
 | Tal i procentform och deras samband med tal i bråk- och decimalform | V7 | 🚧 |
 | Hur tal i bråk- och decimalform kan användas i vardagliga situationer | V5, V6 | 🚧 |
-| De fyra räknesätten och regler för deras användning vid beräkningar med naturliga tal | V2 L5, V3 L1–L6 (grupper, tabellstrategier, areamodell, uppställning, räknelagar/räkneordning), V4 | V2–3 ✅ · V4 🚧 |
-| Metoder för beräkningar med naturliga tal och enkla tal i bråk- och decimalform vid överslagsräkning, huvudräkning och skriftlig beräkning; digitala verktyg | V2 L1–L4, L6 (överslag); V3 L2–L5 (huvudräkning, skriftlig multiplikation, överslag); V4–V6 | V2–3 ✅ (naturliga tal) · övrigt 🚧 |
-| Rimlighetsbedömning vid uppskattningar och beräkningar | V2 L6, V1 L6, V2 L7 | ✅ |
+| De fyra räknesätten och regler för deras användning vid beräkningar med naturliga tal | V2 L5, V3 L1–L6 (grupper, tabellstrategier, areamodell, uppställning, räknelagar/räkneordning), V4 L1–L7 (delning/innehåll, samband med multiplikation, rest, tiotal, liggande stolen, tvåsiffrig delare, rimlighet) | V2–4 ✅ |
+| Metoder för beräkningar med naturliga tal och enkla tal i bråk- och decimalform vid överslagsräkning, huvudräkning och skriftlig beräkning; digitala verktyg | V2 L1–L4, L6 (överslag); V3 L2–L5 (huvudräkning, skriftlig multiplikation, överslag); V4 L4–L7 (huvudräkning, skriftlig division, överslag); V5–V6 | V2–4 ✅ (naturliga tal) · övrigt 🚧 |
+| Rimlighetsbedömning vid uppskattningar och beräkningar | V2 L6, V1 L6, V2 L7, V4 L7 | ✅ |
 
 **Not:** delbarhet, faktorer och primtal (V1 L8) nämns inte uttryckligen i centralt innehåll för åk 4–6 i den
 bifogade texten. Lektionen är märkt *fördjupning* och stödjer division och bråk, men räknas inte som

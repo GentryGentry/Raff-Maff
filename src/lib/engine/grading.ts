@@ -45,6 +45,8 @@ function expectedAnswerText(sol: Solution, spec: ConcreteExercise["spec"]): stri
       return String(sol.value);
     case "areamodel":
       return `${sol.cells.join(", ")} → ${sol.total}`;
+    case "longdiv":
+      return `${sol.quotient}${sol.remainder ? ` rest ${sol.remainder}` : ""}`;
     case "multifield":
       return sol.values.map((v) => v[0]).join(" · ");
     case "text":
@@ -57,7 +59,7 @@ export function gradeExercise(ex: ConcreteExercise, ans: Answer | undefined): It
   const { spec, solution: sol } = ex;
   const base = { id: spec.id, skill: spec.skill, kind: spec.kind, correctAnswerText: expectedAnswerText(sol, spec) };
   const wrong = (feedback: string, max = 1): ItemResult => ({ ...base, points: 0, max, correct: false, feedback });
-  if (!ans || ans.kind !== sol.kind) return wrong("Inget svar angavs.", sol.kind === "column" ? 2 : 1);
+  if (!ans || ans.kind !== sol.kind) return wrong("Inget svar angavs.", ["column", "areamodel", "longdiv"].includes(sol.kind) ? 2 : 1);
 
   switch (sol.kind) {
     case "mc": {
@@ -127,6 +129,20 @@ export function gradeExercise(ex: ConcreteExercise, ans: Answer | undefined): It
       else if (!resultOk && !methodOk) feedback = "Varken svar eller mellansteg stämmer. Gå igenom stegen en kolumn i taget.";
       return { ...base, points: pts, max: 2, correct: resultOk && methodOk, methodOk, feedback };
     }
+    case "longdiv": {
+      const a = ans as Extract<Answer, { kind: "longdiv" }>;
+      const n = sol.q.length;
+      const eq = (x: string[] | undefined, y: string[]) => y.every((v, i) => canonNum(x?.[i] ?? "") === canonNum(v));
+      const qOk = eq(a.q, sol.q);
+      const lastRemOk = canonNum(a.rem?.[n - 1] ?? "") === canonNum(sol.rem[n - 1]);
+      const resultOk = qOk && lastRemOk;
+      const methodOk = eq(a.prod, sol.prod) && eq(a.rem, sol.rem);
+      let feedback = "Rätt kvot och rätt delsteg (produkter och rester)!";
+      if (!resultOk && methodOk) feedback = "Delstegen stämmer men kvotsiffrorna/resten blev fel – läs av kvoten igen.";
+      else if (resultOk && !methodOk) feedback = "Svaret är rätt, men någon produkt eller rest i delstegen stämmer inte. Metoden räknas också.";
+      else if (!resultOk && !methodOk) feedback = "Gå igenom steg för steg: hur många gånger går delaren i talet? Skriv produkten och beräkna resten.";
+      return { ...base, points: (resultOk ? 1 : 0) + (methodOk ? 1 : 0), max: 2, correct: resultOk && methodOk, methodOk, feedback };
+    }
     case "text": {
       const a = ans as Extract<Answer, { kind: "text" }>;
       const minChars = ex.spec.kind === "text" ? ex.spec.minChars : 100;
@@ -160,6 +176,7 @@ export function perfectAnswer(ex: ConcreteExercise): Answer {
     case "fractionbar": return { kind: "fractionbar", value: s.value };
     case "column": return { kind: "column", result: s.result, carries: s.carries, partials: s.partials };
     case "areamodel": return { kind: "areamodel", cells: s.cells, total: s.total };
+    case "longdiv": return { kind: "longdiv", q: s.q, prod: s.prod, rem: s.rem };
     case "multifield": return { kind: "multifield", values: s.values.map((v) => v[0]) };
     case "text": return { kind: "text", value: s.modelAnswer };
   }

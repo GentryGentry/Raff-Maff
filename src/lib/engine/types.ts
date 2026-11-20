@@ -28,6 +28,7 @@ export type ExerciseSpec =
   | { kind: "numberline"; id: string; skill: string; prompt: string; min: number; max: number; step: number; labelEvery: number; format?: "int" | "dec1" | "frac" }
   | { kind: "fractionbar"; id: string; skill: string; prompt: string; parts: number }
   | { kind: "areamodel"; id: string; skill: string; prompt: string; a: number; b: number; aParts: number[]; bParts: number[] }
+  | { kind: "longdiv"; id: string; skill: string; prompt: string; a: number; b: number; p0: number }
   | { kind: "multifield"; id: string; skill: string; prompt: string; fields: { label: string; suffix?: string }[]; visual?: Visual }
   | { kind: "text"; id: string; skill: string; prompt: string; scenario?: string; minChars: number };
 
@@ -38,6 +39,7 @@ export type Answer =
   | { kind: "numberline"; value: number | null }
   | { kind: "fractionbar"; value: number }
   | { kind: "areamodel"; cells: string[]; total: string }
+  | { kind: "longdiv"; q: string[]; prod: string[]; rem: string[] }
   | { kind: "multifield"; values: string[] }
   | { kind: "text"; value: string };
 
@@ -49,6 +51,7 @@ export type Solution =
   | { kind: "numberline"; value: number }
   | { kind: "fractionbar"; value: number }
   | { kind: "areamodel"; cells: string[]; total: string }
+  | { kind: "longdiv"; q: string[]; prod: string[]; rem: string[]; quotient: number; remainder: number }
   | { kind: "multifield"; values: string[][] } // each field: list of accepted values
   | { kind: "text"; rubric: Rubric; modelAnswer: string };
 
