@@ -1,9 +1,9 @@
 import type { Lesson, World } from "./types";
 import { world1 } from "./w1";
 import { world2 } from "./w2";
+import { world3 } from "./w3";
 
 const PLANNED: Omit<World, "lessons">[] = [
-  { id: "w3", index: 3, title: "Multiplikation", icon: "③", tagline: "Tabeller, areamodell och uppställning.", lgr: "Taluppfattning: multiplikation" },
   { id: "w4", index: 4, title: "Division", icon: "④", tagline: "Delningar, rest och liggande stolen.", lgr: "Taluppfattning: division" },
   { id: "w5", index: 5, title: "Bråk", icon: "⑤", tagline: "Delar av helheter, jämförelse och likvärdiga bråk.", lgr: "Taluppfattning: tal i bråkform" },
   { id: "w6", index: 6, title: "Decimaltal", icon: "⑥", tagline: "Tiondelar, hundradelar och räkning med decimaltal.", lgr: "Taluppfattning: tal i decimalform" },
@@ -34,6 +34,7 @@ const PLANNED_LESSONS: Record<string, string[]> = {
 export const WORLDS: World[] = [
   world1,
   world2,
+  world3,
   ...PLANNED.map((w) => ({ ...w, lessons: [] as Lesson[], planned: PLANNED_LESSONS[w.id] })),
 ];
 
