@@ -120,7 +120,7 @@ public/sw.js          Service worker
   SQL:en är skriven efter tabellernas användning, men den har **inte körts mot en riktig Supabase-instans**.
   Kör migrationen och gör en inloggning + ett prov som första test.
 - AI-handledare och AI-granskning (OpenAI-anropen har aldrig körts). Appen degraderar snyggt utan nyckel.
-- Service worker/offline och "Lägg till på hemskärmen" – testat i headless Chromium men **inte på en riktig iPhone**.
+- Service worker/offline och "Lägg till på hemskärmen" – verifierat i headless Chromium (registrering, cachelagrade sidor offline, offline-reservsida) men **inte på en riktig iPhone**.
   Offline fungerar för sidor som besökts tidigare; prov kräver alltid internet.
 
 **Inte byggt**
@@ -133,7 +133,7 @@ public/sw.js          Service worker
   OpenAI-nyckel, en AI-granskning som kan underkänna. Rubriken är en approximation och kan missa korrekta men
   annorlunda formuleringar; det är därför "försök igen" alltid finns och exempelsvar visas efter varje försök.
 - Innehållet är skrivet av en AI och **bör granskas av en lärarutbildare** innan det används på riktigt.
-- Mättekniskt har inga tillgänglighetstester (skärmläsare) gjorts utöver att etiketter finns.
+- Inga tillgänglighetstester med skärmläsare har gjorts; endast aria-etiketter finns.
 
 ## Licens
 
