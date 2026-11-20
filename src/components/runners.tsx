@@ -111,7 +111,7 @@ interface Submitted {
   items: (ItemResult & { explanation: string })[]; newAchievements: { id: string; title: string; icon: string; description: string }[];
 }
 
-export function AssessmentRunner({ lessonId, kind, title, onClose, startLabel }: { lessonId: string; kind: "knowledge" | "method" | "representation" | "pedagogy" | "boss" | "revision" | "academy"; title: string; onClose?: (r: Submitted | null) => void; startLabel?: string }) {
+export function AssessmentRunner({ lessonId, kind, title, onClose, startLabel, autoStart }: { autoStart?: boolean; lessonId: string; kind: "knowledge" | "method" | "representation" | "pedagogy" | "boss" | "revision" | "academy"; title: string; onClose?: (r: Submitted | null) => void; startLabel?: string }) {
   const { refresh } = useAppState();
   const [phase, setPhase] = useState<"idle" | "loading" | "running" | "submitting" | "result">("idle");
   const [started, setStarted] = useState<Started | null>(null);
@@ -139,6 +139,9 @@ export function AssessmentRunner({ lessonId, kind, title, onClose, startLabel }:
       void refresh();
     } catch (e) { setError(e instanceof ApiError ? e.message : "Kunde inte lämna in."); setPhase("running"); }
   };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { if (autoStart) void start(); }, []);
 
   if (phase === "idle" || phase === "loading") {
     return (

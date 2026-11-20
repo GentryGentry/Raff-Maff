@@ -168,7 +168,7 @@ function FinalAssessment({ lesson, sections }: { lesson: Lesson; sections: Recor
         <div key={s} className="card space-y-3 p-5">
           <div className="flex items-center justify-between"><div className="font-semibold">{SECTION_LABEL[s]}</div>{sections[s] ? <Pill tone="green">✓ Godkänd</Pill> : <Pill>Ej godkänd</Pill>}</div>
           <p className="text-sm text-[#8d99b3]">{info[s]}</p>
-          {open === s ? <AssessmentRunner lessonId={lesson.id} kind={s} title={SECTION_LABEL[s]} onClose={() => setOpen(null)} />
+          {open === s ? <AssessmentRunner autoStart lessonId={lesson.id} kind={s} title={SECTION_LABEL[s]} onClose={() => setOpen(null)} />
             : <button className="btn btn-gold w-full" disabled={!theory} onClick={() => setOpen(s)}>{sections[s] ? "Gör om (öva upp mästerskap)" : "Starta"}</button>}
         </div>
       ))}

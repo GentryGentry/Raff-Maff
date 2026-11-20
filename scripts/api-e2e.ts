@@ -1,6 +1,7 @@
 /* Runs against a live dev server (npm run dev). Verifies server-authoritative progression. */
 import { generateAssessment } from "../src/lib/engine/assessment";
 import { perfectAnswer } from "../src/lib/engine/grading";
+import { BUILT_WORLDS } from "../src/lib/content";
 import type { Answer } from "../src/lib/engine/types";
 
 const BASE = process.env.BASE ?? "http://localhost:3000";
@@ -81,6 +82,26 @@ async function take(lessonId: string, kind: string, mode: "perfect" | "wrong") {
   // tutor unavailable without key
   ok((await post("/api/tutor", { messages: [{ role: "user", content: "hej" }] })).status === 503, "tutor reports unconfigured AI gracefully");
 
+  // full playthrough of every built world
+  for (const w of BUILT_WORLDS) {
+    ok((await state()).worlds[w.id].unlocked, `${w.id} is unlocked when reached`);
+    for (const l of w.lessons) {
+      await post("/api/theory", { lessonId: l.id });
+      for (const k of ["knowledge", "method", "representation", "pedagogy"]) {
+        const r = await take(l.id, k, "perfect");
+        if (!r.sub?.json.passed) ok(false, `${l.id} ${k} should pass: ${JSON.stringify(r.start.json.error ?? r.sub?.json).slice(0, 150)}`);
+      }
+    }
+    const st2 = await state();
+    ok(w.lessons.every((l) => st2.progress[l.id]?.status === "completed"), `${w.id}: all ${w.lessons.length} lessons completed via validated assessments`);
+    ok(st2.worlds[w.id].bossUnlocked, `${w.id}: boss unlocked after all lessons`);
+    const bossBad = await take(`${w.id}-boss`, "boss", "wrong");
+    ok(bossBad.sub?.json.passed === false, `${w.id}: boss fails with wrong answers`);
+    const boss = await take(`${w.id}-boss`, "boss", "perfect");
+    ok(boss.sub?.json.passed === true && boss.sub.json.bossPassed, `${w.id}: boss passed (+${boss.sub?.json.xp} XP)`);
+  }
+  const fin = await state();
+  console.log("Final XP", fin.profile.xp, "level", fin.level.level, fin.level.rank, "completion", Math.round(fin.completion * 100) + "%");
   console.log(fails ? `\n${fails} FAILED` : "\nAll API checks passed");
   process.exit(fails ? 1 : 0);
 })();

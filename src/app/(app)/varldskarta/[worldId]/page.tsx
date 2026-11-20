@@ -45,7 +45,7 @@ export default function WorldPage({ params }: { params: Promise<{ worldId: strin
           <div className="flex items-center gap-3"><span className="text-3xl">{ws.bossPassed ? "🏆" : ws.bossUnlocked ? "⚔️" : "🔒"}</span><div><div className="font-semibold">Bossutmaning</div><div className="text-sm text-[#8d99b3]">15 blandade frågor från hela världen. Krav: minst 80 %. Låser upp nästa värld.</div></div></div>
           {ws.bossPassed && <Pill tone="green">✓ Besegrad{state.progress[bid]?.best_knowledge ? ` · bäst ${Math.round(state.progress[bid]!.best_knowledge * 100)} %` : ""}</Pill>}
           {!ws.bossUnlocked && <p className="text-sm text-[#8d99b3]">Klara alla {ws.total} lektioner först.</p>}
-          {ws.bossUnlocked && (boss ? <AssessmentRunner lessonId={bid} kind="boss" title="Bossutmaningen" onClose={() => setBoss(false)} /> : <button className="btn btn-gold w-full" onClick={() => setBoss(true)}>{ws.bossPassed ? "Utmana igen" : "Ta dig an bossen"}</button>)}
+          {ws.bossUnlocked && (boss ? <AssessmentRunner autoStart lessonId={bid} kind="boss" title="Bossutmaningen" onClose={() => setBoss(false)} /> : <button className="btn btn-gold w-full" onClick={() => setBoss(true)}>{ws.bossPassed ? "Utmana igen" : "Ta dig an bossen"}</button>)}
         </div>
       </div>
     </div>

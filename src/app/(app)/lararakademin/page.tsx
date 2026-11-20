@@ -29,7 +29,7 @@ export default function Academy() {
               <summary className="cursor-pointer font-medium">Vanliga missuppfattningar ({l.pupils.length})</summary>
               <div className="mt-2 space-y-3">{l.pupils.map((p) => <div key={p.said}><div className="italic">{p.pupil}: &ldquo;{p.said}&rdquo;</div><div className="mt-1 text-[#8d99b3]"><strong>Problem:</strong> {p.misconception}</div><div className="text-[#8d99b3]"><strong>Respons:</strong> {p.response}</div></div>)}</div>
             </details>
-            {open === l.id ? <AssessmentRunner lessonId={l.id} kind="academy" title="Lärarutmaning" onClose={() => setOpen(null)} />
+            {open === l.id ? <AssessmentRunner autoStart lessonId={l.id} kind="academy" title="Lärarutmaning" onClose={() => setOpen(null)} />
               : <button className="btn btn-gold w-full" onClick={() => setOpen(l.id)}>Öva förklaring</button>}
           </div>
         ))}

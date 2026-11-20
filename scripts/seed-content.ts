@@ -14,7 +14,7 @@ const lessons = WORLDS.flatMap((w) => [
   ...(w.lessons.length ? [{ id: `${w.id}-boss`, world_id: w.id, position: 99, title: `Bossutmaning: ${w.title}`, summary: "Blandat slutprov för hela världen", is_boss: true }] : []),
 ]);
 const exercises = WORLDS.flatMap((w) => w.lessons.flatMap((l) => (["knowledge", "method", "representation"] as const).flatMap((s) => l[s].map((t) => ({ id: `${l.id}:${t.id}`, lesson_id: l.id, section: s, template_id: t.id, skill: t.skill })))));
-const achievements = publicAchievements;
+const achievements = publicAchievements.map((a) => ({ ...a }));
 
 const q = (v: unknown) => (typeof v === "boolean" || typeof v === "number" ? String(v) : `'${String(v).replace(/'/g, "''")}'`);
 const insert = (table: string, rows: Record<string, unknown>[], conflict: string) => {

@@ -21,7 +21,7 @@ export default function Revision() {
           {recs.length ? <>
             <div className="font-semibold">Dags att repetera ({recs.length})</div>
             <ul className="space-y-2">{recs.map((r) => <li key={r.lessonId + (r.skill ?? "")} className="rounded-lg bg-[#070d1c] p-3"><Link href={`/lektion/${r.lessonId}?steg=6`} className="font-medium">{titleOf(r.lessonId)}</Link><div className="text-sm text-[#8d99b3]">{r.reason}</div></li>)}</ul>
-            {run ? <AssessmentRunner lessonId="" kind="revision" title="Repetitionspass" onClose={() => setRun(false)} /> : <button className="btn btn-gold w-full" onClick={() => setRun(true)}>Starta repetitionspass (6 uppgifter)</button>}
+            {run ? <AssessmentRunner autoStart lessonId="" kind="revision" title="Repetitionspass" onClose={() => setRun(false)} /> : <button className="btn btn-gold w-full" onClick={() => setRun(true)}>Starta repetitionspass (6 uppgifter)</button>}
             <p className="text-xs text-[#8d99b3]">Rätt svar ger längre mellanrum (1, 3, 7, 14, 30 dagar). Fel svar flyttar tillbaka uppgiften till i morgon.</p>
           </> : <div className="text-center"><div className="text-3xl">✨</div><p className="mt-2 text-[#c3cce0]">Inget att repetera just nu. Misstag och prov du missar dyker upp här automatiskt.</p></div>}
         </div>
