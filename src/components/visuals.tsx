@@ -52,7 +52,8 @@ function BaseTen({ value }: { value: number }) {
   );
 }
 
-function NumberLineV({ min, max, step, marks = [], labelEvery }: { min: number; max: number; step: number; marks?: number[]; labelEvery?: number }) {
+function NumberLineV({ min, max, step, marks = [], labelEvery, den }: { min: number; max: number; step: number; marks?: number[]; labelEvery?: number; den?: number }) {
+  const fmt = (v: number) => (den ? (v % den === 0 ? String(v / den) : `${v}/${den}`) : sv(v));
   const n = Math.round((max - min) / step);
   const x = (v: number) => 16 + ((v - min) / (max - min)) * 288;
   const le = labelEvery ?? (max - min);
@@ -62,9 +63,9 @@ function NumberLineV({ min, max, step, marks = [], labelEvery }: { min: number; 
       {Array.from({ length: n + 1 }, (_, i) => {
         const v = min + i * step;
         const major = Math.abs(((v - min) / le) - Math.round((v - min) / le)) < 1e-9;
-        return <g key={i}><line x1={x(v)} x2={x(v)} y1={major ? 26 : 30} y2={major ? 46 : 42} stroke="#fff" />{major && <text x={x(v)} y={62} textAnchor="middle" fill="#8d99b3" fontSize={10}>{sv(v)}</text>}</g>;
+        return <g key={i}><line x1={x(v)} x2={x(v)} y1={major ? 26 : 30} y2={major ? 46 : 42} stroke="#fff" />{major && <text x={x(v)} y={62} textAnchor="middle" fill="#8d99b3" fontSize={10}>{fmt(v)}</text>}</g>;
       })}
-      {marks.map((m) => <g key={m}><circle cx={x(m)} cy={36} r={6} fill={GOLD} /><text x={x(m)} y={18} textAnchor="middle" fill={GOLD} fontSize={11} fontWeight={700}>{sv(m)}</text></g>)}
+      {marks.map((m) => <g key={m}><circle cx={x(m)} cy={36} r={6} fill={GOLD} /><text x={x(m)} y={18} textAnchor="middle" fill={GOLD} fontSize={11} fontWeight={700}>{fmt(m)}</text></g>)}
     </svg>
   );
 }
@@ -77,6 +78,47 @@ export function FractionBarV({ parts, shaded, onToggle }: { parts: number; shade
         <rect key={i} x={16 + i * w} y={10} width={w} height={40} rx={3} fill={i < shaded ? GOLD : "#0b1428"} fillOpacity={i < shaded ? 0.9 : 1} stroke="#fff" strokeOpacity={0.6} onClick={() => onToggle?.(i)} style={{ cursor: onToggle ? "pointer" : undefined }} />
       ))}
     </svg>
+  );
+}
+
+function FractionBarsV({ bars }: { bars: { parts: number; shaded: number; label?: string }[] }) {
+  const h = 26, gap = 10;
+  return (
+    <svg viewBox={`0 0 340 ${bars.length * (h + gap)}`} className="w-full max-w-md" role="img" aria-label="Bråkstaplar i jämförelse">
+      {bars.map((b, r) => {
+        const w = 270 / b.parts, y = r * (h + gap);
+        return (
+          <g key={r}>
+            <text x={0} y={y + h / 2 + 4} fontSize={12} fill="#c3cce0">{b.label ?? `${b.shaded}/${b.parts}`}</text>
+            {Array.from({ length: b.parts }, (_, i) => <rect key={i} x={66 + i * w} y={y} width={w} height={h} fill={i < b.shaded ? GOLD : "#0b1428"} fillOpacity={i < b.shaded ? 0.9 : 1} stroke="#fff" strokeOpacity={0.6} />)}
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function FractionCircleV({ parts, shaded }: { parts: number; shaded: number }) {
+  const r = 52, cx = 60, cy = 60;
+  const pt = (i: number) => [cx + r * Math.sin((2 * Math.PI * i) / parts), cy - r * Math.cos((2 * Math.PI * i) / parts)];
+  return (
+    <svg viewBox="0 0 120 120" className="w-40" role="img" aria-label={`Bråkcirkel ${shaded} av ${parts}`}>
+      {parts === 1 ? <circle cx={cx} cy={cy} r={r} fill={shaded ? GOLD : "#0b1428"} stroke="#fff" /> :
+        Array.from({ length: parts }, (_, i) => { const [x1, y1] = pt(i), [x2, y2] = pt(i + 1); return <path key={i} d={`M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${parts === 2 ? 1 : 0} 1 ${x2},${y2} Z`} fill={i < shaded ? GOLD : "#0b1428"} fillOpacity={i < shaded ? 0.9 : 1} stroke="#fff" strokeOpacity={0.7} />; })}
+    </svg>
+  );
+}
+
+function FractionSetV({ total, groups, shadedGroups }: { total: number; groups: number; shadedGroups: number }) {
+  const per = total / groups;
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-3" role="img" aria-label={`${total} föremål i ${groups} lika stora grupper`}>
+      {Array.from({ length: groups }, (_, g) => (
+        <div key={g} className={`flex max-w-[5.5rem] flex-wrap justify-center gap-1 rounded-lg border p-2 ${g < shadedGroups ? "border-[#e8b64a] bg-[#e8b64a]/15" : "border-[#223660]"}`}>
+          {Array.from({ length: per }, (_, i) => <span key={i} className={`h-3 w-3 rounded-full ${g < shadedGroups ? "bg-[#e8b64a]" : "bg-[#60a5fa]"}`} />)}
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -123,6 +165,9 @@ export function VisualView({ v }: { v: Visual }) {
     case "baseten": return <BaseTen value={v.value} />;
     case "numberline": return <NumberLineV {...v} />;
     case "fractionbar": return <FractionBarV parts={v.parts} shaded={v.shaded} />;
+    case "fractionbars": return <FractionBarsV bars={v.bars} />;
+    case "fractioncircle": return <FractionCircleV parts={v.parts} shaded={v.shaded} />;
+    case "fractionset": return <FractionSetV total={v.total} groups={v.groups} shadedGroups={v.shadedGroups} />;
     case "area": return <AreaV a={v.a} b={v.b} />;
     case "grouping": return <Grouping value={v.value} />;
     case "compare": return <Compare a={v.a} b={v.b} />;

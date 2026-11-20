@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Circle, Layer, Line, Rect, Stage, Text } from "react-konva";
 import type Konva from "konva";
 
-export type Preset = "grid" | "numberline" | "fraction" | "area" | "coordinate" | "column";
+export type Preset = "grid" | "numberline" | "fraction" | "fractioncircle" | "area" | "coordinate" | "column";
 type Tool = "pen" | "eraser" | "line" | "rect" | "circle" | "text";
 type Shape =
   | { t: "pen" | "eraser"; color: string; w: number; pts: number[] }
@@ -96,6 +96,11 @@ export default function WorkspaceInner({ preset = "grid", storageKey, height = 3
       const x0 = 16, bw = w - 32, pw = bw / parts, top = mid - 30;
       for (let i = 0; i < parts; i++) els.push(<Rect key={`f${i}`} x={x0 + i * pw} y={top} width={pw} height={60} stroke="#fff" strokeWidth={1.5} listening={false} />);
     }
+    if (preset === "fractioncircle") {
+      const r = Math.min(w, height) / 2 - 24, cx = w / 2, cy = height / 2;
+      els.push(<Circle key="fc" x={cx} y={cy} radius={r} stroke="#fff" strokeWidth={2} listening={false} />);
+      if (parts > 1) for (let i = 0; i < parts; i++) { const a = (2 * Math.PI * i) / parts; els.push(<Line key={`fl${i}`} points={[cx, cy, cx + r * Math.sin(a), cy - r * Math.cos(a)]} stroke="#fff" strokeWidth={1.5} listening={false} />); }
+    }
     if (preset === "area") {
       const cols = Math.floor((w - 40) / CELL), rows = 8;
       els.push(<Rect key="ar" x={20} y={20} width={cols * CELL} height={rows * CELL} stroke="#60a5fa" strokeWidth={2} listening={false} />);
@@ -152,7 +157,7 @@ export default function WorkspaceInner({ preset = "grid", storageKey, height = 3
         <button className={btn(false)} onClick={undo} disabled={!shapes.length} aria-label="Ångra">↶ Ångra</button>
         <button className={btn(false)} onClick={redoFn} disabled={!redo.length} aria-label="Gör om">↷</button>
         <button className={btn(grid)} onClick={() => setGrid(!grid)} aria-pressed={grid}>Rutnät</button>
-        {preset === "fraction" && <><button className={btn(false)} onClick={() => setParts(Math.max(2, parts - 1))} aria-label="Färre delar">−</button><span className="text-sm text-[#8d99b3]">{parts} delar</span><button className={btn(false)} onClick={() => setParts(Math.min(12, parts + 1))} aria-label="Fler delar">+</button></>}
+        {(preset === "fraction" || preset === "fractioncircle") && <><button className={btn(false)} onClick={() => setParts(Math.max(2, parts - 1))} aria-label="Färre delar">−</button><span className="text-sm text-[#8d99b3]">{parts} delar</span><button className={btn(false)} onClick={() => setParts(Math.min(12, parts + 1))} aria-label="Fler delar">+</button></>}
         <button className={btn(false)} onClick={() => { if (shapes.length && window.confirm("Rensa hela ytan?")) { setShapes([]); setRedo([]); } }}>Rensa</button>
         <button className={btn(false)} onClick={save}>Spara bild</button>
       </div>

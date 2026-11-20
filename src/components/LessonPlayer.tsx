@@ -15,7 +15,7 @@ const STEPS = [
   "Introduktion", "Teori", "Visuell förklaring", "Genomgångna exempel", "Steg för steg", "Guidad träning",
   "Självständig träning", "Rita och räkna", "Lärarutmaning", "Slutprov", "Återkoppling",
 ];
-const PRESET: Record<Lesson["drawing"]["tool"], "grid" | "numberline" | "fraction" | "area" | "coordinate" | "column"> = { grid: "grid", numberline: "numberline", fraction: "fraction", area: "area", coordinate: "coordinate", column: "column" };
+const PRESET: Record<Lesson["drawing"]["tool"], "grid" | "numberline" | "fraction" | "fractioncircle" | "area" | "coordinate" | "column"> = { grid: "grid", numberline: "numberline", fraction: "fraction", fractioncircle: "fractioncircle", area: "area", coordinate: "coordinate", column: "column" };
 
 export function LessonPlayer({ lesson }: { lesson: Lesson }) {
   const { state, refresh, loading } = useAppState();

@@ -12,8 +12,11 @@ export const SECTION_LABEL: Record<Section, string> = {
 export type Visual =
   | { type: "placevalue"; value: number }
   | { type: "baseten"; value: number }
-  | { type: "numberline"; min: number; max: number; step: number; marks?: number[]; labelEvery?: number }
+  | { type: "numberline"; min: number; max: number; step: number; marks?: number[]; labelEvery?: number; den?: number }
   | { type: "fractionbar"; parts: number; shaded: number }
+  | { type: "fractionbars"; bars: { parts: number; shaded: number; label?: string }[] }
+  | { type: "fractioncircle"; parts: number; shaded: number }
+  | { type: "fractionset"; total: number; groups: number; shadedGroups: number }
   | { type: "area"; a: number; b: number }
   | { type: "grouping"; value: number }
   | { type: "compare"; a: number; b: number };
@@ -25,7 +28,7 @@ export type ExerciseSpec =
   | { kind: "mc"; id: string; skill: string; prompt: string; options: string[]; visual?: Visual }
   | { kind: "numeric"; id: string; skill: string; prompt: string; unit?: string; visual?: Visual }
   | { kind: "column"; id: string; skill: string; prompt: string; op: ColumnOp; a: number; b: number }
-  | { kind: "numberline"; id: string; skill: string; prompt: string; min: number; max: number; step: number; labelEvery: number; format?: "int" | "dec1" | "frac" }
+  | { kind: "numberline"; id: string; skill: string; prompt: string; min: number; max: number; step: number; labelEvery: number; format?: "int" | "dec1" | "frac"; den?: number }
   | { kind: "fractionbar"; id: string; skill: string; prompt: string; parts: number }
   | { kind: "areamodel"; id: string; skill: string; prompt: string; a: number; b: number; aParts: number[]; bParts: number[] }
   | { kind: "longdiv"; id: string; skill: string; prompt: string; a: number; b: number; p0: number }

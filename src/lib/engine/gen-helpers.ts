@@ -153,7 +153,7 @@ export function areaEx(
 
 export function numberlineEx(
   id: string, skill: string, prompt: string, value: number,
-  line: { min: number; max: number; step: number; labelEvery: number; format?: "int" | "dec1" },
+  line: { min: number; max: number; step: number; labelEvery: number; format?: "int" | "dec1"; den?: number },
   explanation: string, hints: string[],
 ): ConcreteExercise {
   return {
@@ -209,3 +209,18 @@ export function longdivEx(
     explanation, hints,
   };
 }
+
+// ---------- fractions ----------
+export const gcd = (a: number, b: number): number => (b ? gcd(b, a % b) : a);
+export const lcm = (a: number, b: number) => (a / gcd(a, b)) * b;
+/** KaTeX for a fraction. */
+export const tf = (n: number, d: number) => `\\frac{${n}}{${d}}`;
+/** Accepted typed forms of n/d: reduced, as written, and a whole number if it is one. */
+export function fracAcc(n: number, d: number): string[] {
+  const g = gcd(n, d), rn = n / g, rd = d / g;
+  const out = [rd === 1 ? String(rn) : `${rn}/${rd}`];
+  if (!out.includes(`${n}/${d}`)) out.push(`${n}/${d}`);
+  return out;
+}
+/** Label for tick value v on a fraction line whose unit interval has `den` parts. */
+export const fracLabel = (v: number, den: number) => (v % den === 0 ? String(v / den) : `${v}/${den}`);

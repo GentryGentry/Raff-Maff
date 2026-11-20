@@ -7,7 +7,7 @@ import type { Answer, ExerciseSpec } from "@/lib/engine/types";
 
 export interface ExProps { spec: ExerciseSpec; value: Answer | undefined; onChange: (a: Answer) => void; disabled?: boolean }
 
-const TEXT_SKILLS = /^(w1-l9|w8)\./; // roman numerals / negative numbers need a full keyboard
+const TEXT_SKILLS = /^(w1-l9|w5|w8)\./; // roman numerals, fractions ("3/4") and negative numbers need a full keyboard
 
 export function emptyAnswer(spec: ExerciseSpec): Answer {
   switch (spec.kind) {
@@ -122,6 +122,7 @@ function ColumnInput({ spec, value, onChange, disabled }: ExProps & { spec: Extr
 function NumberLineInput({ spec, value, onChange, disabled }: ExProps & { spec: Extract<ExerciseSpec, { kind: "numberline" }> }) {
   const sel = value?.kind === "numberline" ? value.value : null;
   const n = Math.round((spec.max - spec.min) / spec.step);
+  const fmt = (v: number) => (spec.den ? (v % spec.den === 0 ? String(v / spec.den) : `${v}/${spec.den}`) : sv(v));
   const x = (v: number) => 16 + ((v - spec.min) / (spec.max - spec.min)) * 288;
   const pick = (clientX: number, el: SVGSVGElement) => {
     if (disabled) return;
@@ -138,13 +139,13 @@ function NumberLineInput({ spec, value, onChange, disabled }: ExProps & { spec: 
         {Array.from({ length: n + 1 }, (_, i) => {
           const v = spec.min + i * spec.step;
           const major = Math.abs((v - spec.min) / spec.labelEvery - Math.round((v - spec.min) / spec.labelEvery)) < 1e-9;
-          return <g key={i}><line x1={x(v)} x2={x(v)} y1={major ? 28 : 33} y2={major ? 52 : 47} stroke="#fff" strokeOpacity={major ? 1 : 0.6} />{major && <text x={x(v)} y={68} textAnchor="middle" fill="#8d99b3" fontSize={10}>{sv(v)}</text>}</g>;
+          return <g key={i}><line x1={x(v)} x2={x(v)} y1={major ? 28 : 33} y2={major ? 52 : 47} stroke="#fff" strokeOpacity={major ? 1 : 0.6} />{major && <text x={x(v)} y={68} textAnchor="middle" fill="#8d99b3" fontSize={10}>{fmt(v)}</text>}</g>;
         })}
-        {sel !== null && <g><circle cx={x(sel)} cy={40} r={8} fill="#e8b64a" /><text x={x(sel)} y={20} textAnchor="middle" fill="#e8b64a" fontSize={12} fontWeight={700}>{sv(sel)}</text></g>}
+        {sel !== null && <g><circle cx={x(sel)} cy={40} r={8} fill="#e8b64a" /><text x={x(sel)} y={20} textAnchor="middle" fill="#e8b64a" fontSize={12} fontWeight={700}>{fmt(sel)}</text></g>}
       </svg>
       <div className="flex items-center justify-center gap-3">
         <button type="button" className="btn btn-ghost" disabled={disabled} onClick={() => nudge(-1)} aria-label="Flytta ett steg åt vänster">◀</button>
-        <span className="min-w-24 text-center text-sm text-[#8d99b3]">{sel === null ? "Tryck på linjen" : `Valt: ${sv(sel)}`}</span>
+        <span className="min-w-24 text-center text-sm text-[#8d99b3]">{sel === null ? "Tryck på linjen" : `Valt: ${fmt(sel)}`}</span>
         <button type="button" className="btn btn-ghost" disabled={disabled} onClick={() => nudge(1)} aria-label="Flytta ett steg åt höger">▶</button>
       </div>
     </div>

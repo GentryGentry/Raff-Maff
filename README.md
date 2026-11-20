@@ -81,10 +81,11 @@ fel → tillbaka till 1 dag), (2) underkända kunskapsprov, (3) svaga färdighet
 ## Test
 
 ```bash
-npm test                              # enhetstester: ~260 tester – alla generatorer × 150 frön × 3 nivåer, bedömning, tröskelvärden
+npm test                              # enhetstester: ~320 tester – alla generatorer × 150 frön × 3 nivåer, bedömning, tröskelvärden
 npm run dev                           # i en terminal
 npx tsx scripts/api-e2e.ts            # mot körande dev-server: upplåsning, replay/förfalskning, XP, hela genomspelet av alla byggda världar
 npx tsx scripts/ui-column.ts <mapp>   # styr riktiga UI:t (iPhone-emulering) och löser en uppställningsuppgift
+npx tsx scripts/ui-solve.ts w5-l1,w5-l2   # genomför kunskaps-/metod-/representationsprov via riktiga UI:t för ALLA uppgiftstyper
 ```
 
 Enhetstesterna verifierar bl.a. att varje genererad uppgift är välformad (inga dubbletter i flervalsalternativ,
@@ -110,7 +111,7 @@ public/sw.js          Service worker
 
 **Byggt och testat**
 - Hela appskalet (Hem, Världskarta, Lärarakademin, Repetition, Profil, Räkneyta, AI-handledare, inloggning).
-- **Värld 1 (9 lektioner), Värld 2 (7) och Värld 3 – Multiplikation (6) och Värld 4 – Division (7)** med alla 11 lektionssteg, genererade uppgifter,
+- **Värld 1 (9 lektioner), Värld 2 (7) och Värld 3 – Multiplikation (6) och Värld 4 – Division (7) och Värld 5 – Bråk (7)** med alla 11 lektionssteg, genererade uppgifter,
   fyrdelad slutbedömning, lärarutmaningar med elevfall, och bossutmaningar.
 - Server-side rättning, upplåsning, XP/nivåer/streak, 13 märken, mastery, repetition – genomspelade i `api-e2e`.
 - Strukturerad uppställning (minnessiffror/växling/delprodukter), areamodell, tallinje, bråkstapel, Konva-rityta.
@@ -124,9 +125,9 @@ public/sw.js          Service worker
   Offline fungerar för sidor som besökts tidigare; prov kräver alltid internet.
 
 **Inte byggt**
-- **Världarna 5–13** finns på kartan som planerade (🚧) men har **inget innehåll**. De går inte att öppna och ger
+- **Världarna 6–13** finns på kartan som planerade (🚧) men har **inget innehåll**. De går inte att öppna och ger
   inga framsteg. Se `docs/lgr22-mapping.md` för vad som återstår. Innehållsmodellen är gjord för att fler lektioner
-  läggs till som TypeScript-filer i `src/lib/content/` (se `w2/`–`w4/` som mall).
+  läggs till som TypeScript-filer i `src/lib/content/` (se `w2/`–`w5/` som mall).
 - Frihandsritning bedöms inte automatiskt (se ovan).
 - Programmering/algoritmer (står i Lgr22) saknas bland de 13 världarna.
 - Lärarförklaringar bedöms med en regelbaserad rubrik (begrepp + minimilängd + skydd mot nyckelordsfyllning) och, med
