@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Rich } from "@/components/Rich";
 import { ExerciseView, emptyAnswer, isAnswered } from "@/components/exercises/ExerciseView";
 import { Bar, Pill, Spinner, pushToast } from "@/components/ui";
@@ -140,8 +140,10 @@ export function AssessmentRunner({ lessonId, kind, title, onClose, startLabel, a
     } catch (e) { setError(e instanceof ApiError ? e.message : "Kunde inte lämna in."); setPhase("running"); }
   };
 
+  // Guard: React StrictMode (dev) runs effects twice, which would start two assessments.
+  const autoStarted = useRef(false);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { if (autoStart) void start(); }, []);
+  useEffect(() => { if (autoStart && !autoStarted.current) { autoStarted.current = true; void start(); } }, []);
 
   if (phase === "idle" || phase === "loading") {
     return (
