@@ -11,9 +11,9 @@ import { world9 } from "./w9";
 import { world10 } from "./w10";
 import { world11 } from "./w11";
 import { world12 } from "./w12";
+import { world13 } from "./w13";
 
 const PLANNED: Omit<World, "lessons">[] = [
-  { id: "w13", index: 13, title: "Problemlösning och matematiska resonemang", icon: "⑬", tagline: "Strategier, modeller och att resonera.", lgr: "Problemlösning" },
 ];
 
 const PLANNED_LESSONS: Record<string, string[]> = {
@@ -25,7 +25,6 @@ const PLANNED_LESSONS: Record<string, string[]> = {
   w7: ["Vad är procent?", "Procent, bråk och decimaltal", "Vanliga procent (10, 25, 50 %)", "Procent av ett tal", "Förändring i procent"],
   w8: ["Negativa tal på tallinjen", "Jämföra negativa tal", "Addition och subtraktion med negativa tal", "Temperatur och skulder"],
   w9: ["Talmönster", "Uttryck och variabler", "Likhetstecknet", "Enkla ekvationer", "Formler"],
-  w13: ["Problemlösningsstrategier", "Rita och modellera", "Prova och pröva", "Matematiska resonemang", "Rimlighet"],
 };
 
 export const WORLDS: World[] = [
@@ -41,6 +40,7 @@ export const WORLDS: World[] = [
   world10,
   world11,
   world12,
+  world13,
   ...PLANNED.map((w) => ({ ...w, lessons: [] as Lesson[], planned: PLANNED_LESSONS[w.id] })),
 ];
 

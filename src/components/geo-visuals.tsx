@@ -435,3 +435,25 @@ export function ComboTableV({ rows, cols }: { rows: string[]; cols: string[] }) 
     </svg>
   );
 }
+
+/** "Stapelmodell": rows of equal boxes (parts of a whole), optional extra boxes and a total bracket. */
+export function BarModelV({ rows, total, boxLabel }: { rows: { label: string; parts: number; extra?: { n: number; label: string }; end?: string }[]; total?: string; boxLabel?: string }) {
+  const lw = 70, rh = 36, maxN = Math.max(...rows.map((r) => r.parts + (r.extra?.n ?? 0)), 1);
+  const bw = Math.min(46, 270 / maxN);
+  const W = lw + maxN * bw + 70, H = rows.length * rh + (total ? 34 : 10);
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-sm" role="img" aria-label="Stapelmodell">
+      {rows.map((r, i) => (
+        <g key={r.label}>
+          <text x={4} y={i * rh + 24} fill="#fff" fontSize={12} fontWeight={600}>{r.label}</text>
+          {Array.from({ length: r.parts }, (_, k) => (
+            <g key={k}><rect x={lw + k * bw} y={i * rh + 6} width={bw - 2} height={26} rx={4} fill={BLUE} fillOpacity={0.55} stroke="#fff" strokeOpacity={0.7} />{boxLabel && <text x={lw + k * bw + (bw - 2) / 2} y={i * rh + 24} textAnchor="middle" fill="#fff" fontSize={10}>{boxLabel}</text>}</g>
+          ))}
+          {r.extra && <g><rect x={lw + r.parts * bw} y={i * rh + 6} width={r.extra.n * bw - 2} height={26} rx={4} fill={GOLD} fillOpacity={0.6} stroke="#fff" strokeOpacity={0.7} /><text x={lw + r.parts * bw + (r.extra.n * bw - 2) / 2} y={i * rh + 24} textAnchor="middle" fill="#fff" fontSize={11} fontWeight={700}>{r.extra.label}</text></g>}
+          {r.end && <text x={lw + (r.parts + (r.extra?.n ?? 0)) * bw + 6} y={i * rh + 24} fill={GOLD} fontSize={13} fontWeight={700}>{r.end}</text>}
+        </g>
+      ))}
+      {total && <g><path d={`M ${lw} ${rows.length * rh + 6} L ${lw} ${rows.length * rh + 12} L ${lw + maxN * bw - 2} ${rows.length * rh + 12} L ${lw + maxN * bw - 2} ${rows.length * rh + 6}`} fill="none" stroke={GOLD} strokeWidth={1.6} /><text x={lw + (maxN * bw) / 2} y={rows.length * rh + 28} textAnchor="middle" fill={GOLD} fontSize={13} fontWeight={700}>{total}</text></g>}
+    </svg>
+  );
+}

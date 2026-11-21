@@ -58,6 +58,7 @@ export type Visual =
   | { type: "marbles"; counts: { color: string; n: number }[] } // color: röd | blå | grön | gul | lila
   | { type: "spinner"; sectors: string[] } // equal sectors, colour names
   | { type: "combotable"; rows: string[]; cols: string[] }
+  | { type: "barmodel"; rows: { label: string; parts: number; extra?: { n: number; label: string }; end?: string }[]; total?: string; boxLabel?: string }
   | { type: "ruler"; cm: number; from: number; to: number } // from/to in mm
   | { type: "clock"; h: number; m: number }
   | { type: "circle"; line: "radius" | "diameter" | "both"; rLabel?: string; dLabel?: string }

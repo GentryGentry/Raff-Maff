@@ -2,7 +2,7 @@
 import { useState } from "react";
 import type { Visual } from "@/lib/engine/types";
 import { sv, tickLabel } from "@/lib/engine/gen-helpers";
-import { BarChartV, ComboTableV, LineChartV, MarblesV, PictogramV, SpinnerV, AngleV, CircleV, ClockV, RulerV, CoordPlane, CuboidV, PolygonV, SolidV } from "@/components/geo-visuals";
+import { BarModelV, BarChartV, ComboTableV, LineChartV, MarblesV, PictogramV, SpinnerV, AngleV, CircleV, ClockV, RulerV, CoordPlane, CuboidV, PolygonV, SolidV } from "@/components/geo-visuals";
 
 const GOLD = "#e8b64a";
 const LINE = "#3a4c78";
@@ -329,6 +329,7 @@ export function VisualView({ v }: { v: Visual }) {
     case "marbles": return <MarblesV counts={v.counts} />;
     case "spinner": return <SpinnerV sectors={v.sectors} />;
     case "combotable": return <ComboTableV rows={v.rows} cols={v.cols} />;
+    case "barmodel": return <BarModelV rows={v.rows} total={v.total} boxLabel={v.boxLabel} />;
     case "ruler": return <RulerV cm={v.cm} from={v.from} to={v.to} />;
     case "clock": return <ClockV h={v.h} m={v.m} />;
     case "circle": return <CircleV line={v.line} rLabel={v.rLabel} dLabel={v.dLabel} />;

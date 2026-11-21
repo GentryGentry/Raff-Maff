@@ -12,7 +12,7 @@ insert into public.worlds (id, position, title, tagline, built) values
   ('w10', 10, 'Geometri', 'Månghörningar, omkrets, area, volym, vinklar, symmetri, koordinatsystem, cirklar och kroppar.', true),
   ('w11', 11, 'Enheter och mätning', 'Längd, massa, volym, tid, area, skala och att välja och byta enheter.', true),
   ('w12', 12, 'Statistik och sannolikhet', 'Tabeller och diagram, medelvärde, median, typvärde, chans, experiment och kombinatorik.', true),
-  ('w13', 13, 'Problemlösning och matematiska resonemang', 'Strategier, modeller och att resonera.', false)
+  ('w13', 13, 'Problemlösning och matematiska resonemang', 'Förstå, modellera, pröva, arbeta baklänges, resonera, kontrollera och välja strategi.', true)
 on conflict (id) do update set position=excluded.position, title=excluded.title, tagline=excluded.tagline, built=excluded.built;
 
 insert into public.lessons (id, world_id, position, title, summary, is_boss) values
@@ -120,7 +120,15 @@ insert into public.lessons (id, world_id, position, title, summary, is_boss) val
   ('w12-l5', 'w12', 5, 'Experiment, relativ frekvens och förväntat antal', 'Relativ frekvens = antal gånger ÷ antal försök. Förväntat antal = sannolikhet · antal försök.', false),
   ('w12-l6', 'w12', 6, 'Kombinatorik – att räkna alla möjligheter', 'Multiplikationsprincipen: val i steg multipliceras. Tabell, träd och systematisk lista.', false),
   ('w12-l7', 'w12', 7, 'Tolka, jämföra och granska data', 'Jämföra grupper, upptäcka vilseledande diagram och dra rimliga slutsatser.', false),
-  ('w12-boss', 'w12', 99, 'Bossutmaning: Statistik och sannolikhet', 'Blandat slutprov för hela världen', true)
+  ('w12-boss', 'w12', 99, 'Bossutmaning: Statistik och sannolikhet', 'Blandat slutprov för hela världen', true),
+  ('w13-l1', 'w13', 1, 'Förstå problemet och planera', 'Vad frågas efter? Vilken information behövs, och vilken är överflödig?', false),
+  ('w13-l2', 'w13', 2, 'Rita och modellera – stapelmodellen', 'En enkel bild (stapelmodell) gör relationer mellan tal synliga innan man räknar.', false),
+  ('w13-l3', 'w13', 3, 'Prova och pröva – systematiskt', 'Gissa med plan: pröva, se hur nära du kom och justera. Skriv ned försöken.', false),
+  ('w13-l4', 'w13', 4, 'Arbeta baklänges', 'Känner du resultatet och stegen? Gör motsatta räkneoperationer i omvänd ordning.', false),
+  ('w13-l5', 'w13', 5, 'Matematiska resonemang – påståenden, motexempel och argument', 'Ett påstående kan prövas: ett motexempel motbevisar det, men många exempel bevisar inget. Ett allmänt argument gör det.', false),
+  ('w13-l6', 'w13', 6, 'Rimlighet, överslag och kontroll', 'Avrunda, uppskatta och kontrollera med motsatt räknesätt innan du litar på ett svar.', false),
+  ('w13-l7', 'w13', 7, 'Välj strategi – blandade problem', 'Rita, pröva, arbeta baklänges, göra listor, hitta mönster eller förenkla – och kontrollera.', false),
+  ('w13-boss', 'w13', 99, 'Bossutmaning: Problemlösning och matematiska resonemang', 'Blandat slutprov för hela världen', true)
 on conflict (id) do update set world_id=excluded.world_id, position=excluded.position, title=excluded.title, summary=excluded.summary, is_boss=excluded.is_boss;
 
 insert into public.exercises (id, lesson_id, section, template_id, skill) values
@@ -1041,7 +1049,59 @@ insert into public.exercises (id, lesson_id, section, template_id, skill) values
   ('w12-l7:sampling', 'w12-l7', 'knowledge', 'sampling', 'w12-l7.sample'),
   ('w12-l7:compareSteps', 'w12-l7', 'method', 'compareSteps', 'w12-l7.groups'),
   ('w12-l7:shareBar', 'w12-l7', 'representation', 'shareBar', 'w12-l7.share'),
-  ('w12-l7:axisRead', 'w12-l7', 'representation', 'axisRead', 'w12-l7.axis')
+  ('w12-l7:axisRead', 'w12-l7', 'representation', 'axisRead', 'w12-l7.axis'),
+  ('w13-l1:extraInfo', 'w13-l1', 'knowledge', 'extraInfo', 'w13-l1.extra'),
+  ('w13-l1:twoStep', 'w13-l1', 'knowledge', 'twoStep', 'w13-l1.steps'),
+  ('w13-l1:missing', 'w13-l1', 'knowledge', 'missing', 'w13-l1.missing'),
+  ('w13-l1:askable', 'w13-l1', 'knowledge', 'askable', 'w13-l1.question'),
+  ('w13-l1:sumCheck', 'w13-l1', 'knowledge', 'sumCheck', 'w13-l1.check'),
+  ('w13-l1:shopSteps', 'w13-l1', 'method', 'shopSteps', 'w13-l1.steps'),
+  ('w13-l1:modelRead', 'w13-l1', 'representation', 'modelRead', 'w13-l1.model'),
+  ('w13-l1:chooseCalc', 'w13-l1', 'representation', 'chooseCalc', 'w13-l1.model'),
+  ('w13-l2:ratio', 'w13-l2', 'knowledge', 'ratio', 'w13-l2.ratio'),
+  ('w13-l2:diff', 'w13-l2', 'knowledge', 'diff', 'w13-l2.diff'),
+  ('w13-l2:fraction', 'w13-l2', 'knowledge', 'fraction', 'w13-l2.fraction'),
+  ('w13-l2:unitValue', 'w13-l2', 'knowledge', 'unitValue', 'w13-l2.unit'),
+  ('w13-l2:chooseModel', 'w13-l2', 'knowledge', 'chooseModel', 'w13-l2.choose'),
+  ('w13-l2:ratioSteps', 'w13-l2', 'method', 'ratioSteps', 'w13-l2.ratio'),
+  ('w13-l2:readRatio', 'w13-l2', 'representation', 'readRatio', 'w13-l2.picture'),
+  ('w13-l2:readDiff', 'w13-l2', 'representation', 'readDiff', 'w13-l2.picture'),
+  ('w13-l3:sumProd', 'w13-l3', 'knowledge', 'sumProd', 'w13-l3.pairs'),
+  ('w13-l3:animals', 'w13-l3', 'knowledge', 'animals', 'w13-l3.animals'),
+  ('w13-l3:digits', 'w13-l3', 'knowledge', 'digits', 'w13-l3.digits'),
+  ('w13-l3:ages', 'w13-l3', 'knowledge', 'ages', 'w13-l3.ages'),
+  ('w13-l3:strategy', 'w13-l3', 'knowledge', 'strategy', 'w13-l3.concept'),
+  ('w13-l3:trialSteps', 'w13-l3', 'method', 'trialSteps', 'w13-l3.pairs'),
+  ('w13-l3:animalModel', 'w13-l3', 'representation', 'animalModel', 'w13-l3.model'),
+  ('w13-l4:chain', 'w13-l4', 'knowledge', 'chain', 'w13-l4.chain'),
+  ('w13-l4:money', 'w13-l4', 'knowledge', 'money', 'w13-l4.money'),
+  ('w13-l4:inverse', 'w13-l4', 'knowledge', 'inverse', 'w13-l4.inverse'),
+  ('w13-l4:order', 'w13-l4', 'knowledge', 'order', 'w13-l4.order'),
+  ('w13-l4:backSteps', 'w13-l4', 'method', 'backSteps', 'w13-l4.chain'),
+  ('w13-l4:flow', 'w13-l4', 'representation', 'flow', 'w13-l4.flow'),
+  ('w13-l5:truth', 'w13-l5', 'knowledge', 'truth', 'w13-l5.claim'),
+  ('w13-l5:counter', 'w13-l5', 'knowledge', 'counter', 'w13-l5.counter'),
+  ('w13-l5:someNever', 'w13-l5', 'knowledge', 'someNever', 'w13-l5.allsome'),
+  ('w13-l5:proof', 'w13-l5', 'knowledge', 'proof', 'w13-l5.argument'),
+  ('w13-l5:whyEnough', 'w13-l5', 'knowledge', 'whyEnough', 'w13-l5.argument'),
+  ('w13-l5:counterSteps', 'w13-l5', 'method', 'counterSteps', 'w13-l5.counter'),
+  ('w13-l5:dotsParity', 'w13-l5', 'representation', 'dotsParity', 'w13-l5.picture'),
+  ('w13-l5:dotsTotal', 'w13-l5', 'representation', 'dotsTotal', 'w13-l5.picture'),
+  ('w13-l6:roundSum', 'w13-l6', 'knowledge', 'roundSum', 'w13-l6.estimate'),
+  ('w13-l6:roundMul', 'w13-l6', 'knowledge', 'roundMul', 'w13-l6.estimate'),
+  ('w13-l6:decimalMc', 'w13-l6', 'knowledge', 'decimalMc', 'w13-l6.decimal'),
+  ('w13-l6:inverse', 'w13-l6', 'knowledge', 'inverse', 'w13-l6.inverse'),
+  ('w13-l6:bigOrSmall', 'w13-l6', 'knowledge', 'bigOrSmall', 'w13-l6.direction'),
+  ('w13-l6:estimateSteps', 'w13-l6', 'method', 'estimateSteps', 'w13-l6.estimate'),
+  ('w13-l6:balanceEstimate', 'w13-l6', 'representation', 'balanceEstimate', 'w13-l6.picture'),
+  ('w13-l7:strategyMc', 'w13-l7', 'knowledge', 'strategyMc', 'w13-l7.strategy'),
+  ('w13-l7:discount', 'w13-l7', 'knowledge', 'discount', 'w13-l7.percent'),
+  ('w13-l7:recipe', 'w13-l7', 'knowledge', 'recipe', 'w13-l7.proportion'),
+  ('w13-l7:train', 'w13-l7', 'knowledge', 'train', 'w13-l7.time'),
+  ('w13-l7:floorCost', 'w13-l7', 'knowledge', 'floorCost', 'w13-l7.area'),
+  ('w13-l7:discountSteps', 'w13-l7', 'method', 'discountSteps', 'w13-l7.percent'),
+  ('w13-l7:discountBar', 'w13-l7', 'representation', 'discountBar', 'w13-l7.percent'),
+  ('w13-l7:strategyPick', 'w13-l7', 'representation', 'strategyPick', 'w13-l7.strategy')
 on conflict (id) do update set lesson_id=excluded.lesson_id, section=excluded.section, template_id=excluded.template_id, skill=excluded.skill;
 
 insert into public.achievements (id, title, description, icon, xp) values

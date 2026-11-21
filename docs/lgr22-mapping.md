@@ -52,7 +52,8 @@ kravinnehåll.
 | Proportionalitet i bråk-, decimal- och procentform | V7 L5 (dubbel tallinje, proportionalitet i procentform), V7 L3–L4, L7; bråk som del av antal i V5 L7 | ✅ (procent) · grafer 🚧 |
 | Koordinatsystem och gradering av koordinataxlar | V10 L8 (första kvadranten, punkter, avstånd, rektanglar, regler och tabeller) | ✅ (första kvadranten) |
 | Grafer för proportionella samband | V10 L8 (regel → tabell → punkter på en linje, enkelt); egentliga grafer av proportionella samband föreslås i V12 | ✅ delvis |
-| Strategier för att lösa matematiska problem; formulera frågeställningar | V2 L7, V13 | V2 L7 ✅ |
+| Strategier för att lösa matematiska problem; formulera frågeställningar | V2 L7, V13 L1–L7 (förstå, modellera, pröva, baklänges, resonera, rimlighet, välja strategi) | ✅ |
+| Matematiska resonemang; motexempel; argument | V13 L5 | ✅ |
 
 ## Luckor att besluta om
 
