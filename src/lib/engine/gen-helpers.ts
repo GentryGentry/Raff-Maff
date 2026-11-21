@@ -174,7 +174,7 @@ export function fractionbarEx(
 }
 
 export function withVisual(ex: ConcreteExercise, visual: import("./types").Visual): ConcreteExercise {
-  if (ex.spec.kind === "mc" || ex.spec.kind === "numeric" || ex.spec.kind === "multifield") {
+  if (ex.spec.kind === "mc" || ex.spec.kind === "numeric" || ex.spec.kind === "multifield" || ex.spec.kind === "expr") {
     return { ...ex, spec: { ...ex.spec, visual } };
   }
   return ex;
@@ -262,3 +262,23 @@ export const pc = (p: number | string) => `${p}\u00a0%`;
 export function gridshadeEx(id: string, skill: string, prompt: string, value: number, explanation: string, hints: string[]): ConcreteExercise {
   return { spec: { kind: "gridshade", id, skill, prompt }, solution: { kind: "gridshade", value }, explanation, hints };
 }
+
+// ---------- algebra ----------
+export function exprEx(
+  id: string, skill: string, prompt: string, accept: string, explanation: string, hints: string[],
+  opts: { variable?: string; simplified?: boolean; visual?: import("./types").Visual } = {},
+): ConcreteExercise {
+  return {
+    spec: { kind: "expr", id, skill, prompt, variable: opts.variable ?? "n", ...(opts.visual ? { visual: opts.visual } : {}) },
+    solution: { kind: "expr", accept, simplified: opts.simplified },
+    explanation, hints,
+  };
+}
+
+/** Square patterns: figure n is a list of column heights. total(n) = a·n + b. */
+export const SQUARE_PATTERNS: Record<string, { a: number; b: number; heights: (n: number) => number[] }> = {
+  double: { a: 2, b: 0, heights: (n) => Array(n).fill(2) },
+  hook: { a: 2, b: 1, heights: (n) => [n + 1, ...Array(n).fill(1)] },
+  ell: { a: 2, b: -1, heights: (n) => [n, ...Array(Math.max(0, n - 1)).fill(1)] },
+  towers: { a: 3, b: 1, heights: (n) => [...Array(n).fill(3), 1] },
+};

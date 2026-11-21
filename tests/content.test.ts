@@ -271,3 +271,86 @@ describe("answer normalisation accepts how people actually type", () => {
     expect(ok(ex("35"), "0,35")).toBe(false);
   });
 });
+
+// ── Independent check of algebra exercises: solve/simplify/evaluate the PROMPT with a separate parser ──
+import { parseExpr, equivalent as exprEquivalent } from "@/lib/engine/expr";
+describe("algebra exercises agree with their own prompts (independent solver)", () => {
+  const gen = (lessonId: string, tplId: string, seed: number, level = 1) => {
+    const lesson = getLesson(lessonId)!;
+    const t = [...lesson.knowledge, ...lesson.method, ...lesson.representation].find((x) => x.id === tplId)!;
+    return t.gen(makeRng(`alg${seed}`), { level });
+  };
+  const num = (ex: ConcreteExercise) => (ex.solution.kind === "numeric" ? Number(ex.solution.accept[0]) : NaN);
+
+  for (const [lesson, tpl] of [["w9-l5", "solve"], ["w9-l5", "unknownFirst"], ["w9-l6", "solve"]] as const) {
+    it(`${lesson} ${tpl}: brute-force the equation in the prompt`, () => {
+      for (let seed = 0; seed < 300; seed++) {
+        const ex = gen(lesson, tpl, seed);
+        const m = ex.spec.prompt.match(/^Lös ekvationen (.+)$/);
+        if (!m) throw new Error(`no match: ${ex.spec.prompt}`);
+        const [l, r] = m[1].split("=");
+        const fl = parseExpr(l, "x"), fr = parseExpr(r, "x");
+        const sols: number[] = [];
+        for (let x = 0; x <= 400; x++) if (Math.abs(fl(x) - fr(x)) < 1e-9) sols.push(x);
+        expect(sols, ex.spec.prompt).toHaveLength(1);
+        expect(num(ex), ex.spec.prompt).toBe(sols[0]);
+      }
+    });
+  }
+  it("w9-l7 story problems: rebuild the equation from the numbers in the text", () => {
+    for (let seed = 0; seed < 300; seed++) {
+      let ex = gen("w9-l7", "thinkNumber", seed);
+      let m = ex.spec.prompt.match(/multiplicerar det med (\d+) och lägger till (\d+)\. Resultatet är (\d+)/)!;
+      expect(num(ex)).toBe((Number(m[3]) - Number(m[2])) / Number(m[1]));
+      ex = gen("w9-l7", "tickets", seed);
+      m = ex.spec.prompt.match(/^(\d+) biljetter och en glass som kostar (\d+) kr kostar tillsammans (\d+) kr/)!;
+      expect(num(ex)).toBe((Number(m[3]) - Number(m[2])) / Number(m[1]));
+      ex = gen("w9-l7", "money", seed);
+      m = ex.spec.prompt.match(/Hon får (\d+) kr och har då (\d+) kr/)!;
+      expect(num(ex)).toBe(Number(m[2]) - Number(m[1]));
+    }
+  });
+  it("w9-l9 simplification answers are equivalent to the expression in the prompt", () => {
+    for (const tpl of ["collect", "mixed", "minus", "distribute"] as const) for (let seed = 0; seed < 300; seed++) {
+      const ex = gen("w9-l9", tpl, seed);
+      const m = ex.spec.prompt.match(/^Förenkla (.+?)( – skriv utan parentes\.)?$/)!;
+      const accept = ex.solution.kind === "expr" ? ex.solution.accept : "";
+      expect(exprEquivalent(m[1], accept, "n"), `${m[1]} vs ${accept}`).toBe(true);
+    }
+  });
+  it("w9-l4 evaluate: value of the expression in the prompt", () => {
+    for (let seed = 0; seed < 300; seed++) {
+      const ex = gen("w9-l4", "evaluate", seed, 2);
+      const m = ex.spec.prompt.match(/^Vad är värdet av (.+) när n = (\d+)\?$/)!;
+      expect(num(ex), ex.spec.prompt).toBe(parseExpr(m[1], "n")(Number(m[2])));
+    }
+  });
+  it("w9-l2 sequences: constant difference and the asked term", () => {
+    for (let seed = 0; seed < 300; seed++) {
+      const ex = gen("w9-l2", "nextTerm", seed);
+      const t = ex.spec.prompt.match(/följden: ([\d, ]+), …/)![1].split(",").map((s) => Number(s.trim()));
+      const d = t[1] - t[0];
+      expect(t.every((v, i) => i === 0 || v - t[i - 1] === d)).toBe(true);
+      expect(num(ex)).toBe(t[t.length - 1] + d);
+      const ex2 = gen("w9-l2", "tenth", seed);
+      const t2 = ex2.spec.prompt.match(/börjar ([\d, ]+), …/)![1].split(",").map((s) => Number(s.trim()));
+      expect(num(ex2)).toBe(t2[0] + 9 * (t2[1] - t2[0]));
+    }
+  });
+  it("w9-l8 algorithms: simulate the instruction text", () => {
+    for (let seed = 0; seed < 300; seed++) {
+      let ex = gen("w9-l8", "loopAdd", seed);
+      let m = ex.spec.prompt.match(/Börja med (\d+)\. Upprepa (\d+) gånger: addera (\d+)\./)!;
+      let v = Number(m[1]); for (let i = 0; i < Number(m[2]); i++) v += Number(m[3]);
+      expect(num(ex)).toBe(v);
+      ex = gen("w9-l8", "condThree", seed);
+      v = Number(ex.spec.prompt.match(/Börja med (\d+) och/)![1]);
+      for (let i = 0; i < 3; i++) v = v % 2 === 0 ? v / 2 : 3 * v + 1;
+      expect(num(ex)).toBe(v);
+      ex = gen("w9-l8", "until", seed);
+      m = ex.spec.prompt.match(/Börja med (\d+)\. Dra bort (\d+) så länge talet är minst (\d+)\./)!;
+      v = Number(m[1]); let c = 0; while (v >= Number(m[3])) { v -= Number(m[2]); c++; }
+      expect(num(ex)).toBe(c);
+    }
+  });
+});

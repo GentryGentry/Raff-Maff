@@ -1,3 +1,4 @@
+import { equivalent, isSimplifiedLike } from "./expr";
 import type { Answer, ConcreteExercise, ItemResult, Rubric, Solution } from "./types";
 
 export function normNum(s: string): string {
@@ -47,6 +48,8 @@ function expectedAnswerText(sol: Solution, spec: ConcreteExercise["spec"]): stri
       return String(sol.value);
     case "areamodel":
       return `${sol.cells.join(", ")} → ${sol.total}`;
+    case "expr":
+      return sol.accept;
     case "longdiv":
       return `${sol.quotient}${sol.remainder ? ` rest ${sol.remainder}` : ""}`;
     case "multifield":
@@ -132,6 +135,15 @@ export function gradeExercise(ex: ConcreteExercise, ans: Answer | undefined): It
       else if (!resultOk && !methodOk) feedback = "Varken svar eller mellansteg stämmer. Gå igenom stegen en kolumn i taget.";
       return { ...base, points: pts, max: 2, correct: resultOk && methodOk, methodOk, feedback };
     }
+    case "expr": {
+      const a = ans as Extract<Answer, { kind: "expr" }>;
+      const variable = ex.spec.kind === "expr" ? ex.spec.variable : "n";
+      const typed = (a.value ?? "").trim();
+      if (!typed) return wrong("Inget uttryck angavs.");
+      if (!equivalent(typed, sol.accept, variable)) return wrong(`Uttrycket är inte rätt, eller så använder det en annan bokstav än ${variable}. Testa genom att sätta in ett tal för ${variable} i både ditt uttryck och uppgiften.`);
+      if (sol.simplified && !isSimplifiedLike(typed, sol.accept, variable)) return wrong("Uttrycket har rätt värde men är inte förenklat. Samla lika termer och skriv utan parenteser.");
+      return { ...base, points: 1, max: 1, correct: true, feedback: "Rätt!" };
+    }
     case "longdiv": {
       const a = ans as Extract<Answer, { kind: "longdiv" }>;
       const n = sol.q.length;
@@ -178,6 +190,7 @@ export function perfectAnswer(ex: ConcreteExercise): Answer {
     case "numberline": return { kind: "numberline", value: s.value };
     case "fractionbar": return { kind: "fractionbar", value: s.value };
     case "gridshade": return { kind: "gridshade", value: s.value };
+    case "expr": return { kind: "expr", value: s.accept };
     case "column": return { kind: "column", result: s.result, carries: s.carries, partials: s.partials };
     case "areamodel": return { kind: "areamodel", cells: s.cells, total: s.total };
     case "longdiv": return { kind: "longdiv", q: s.q, prod: s.prod, rem: s.rem };

@@ -216,6 +216,50 @@ function ThermometerV({ value, min = -20, max = 30 }: { value: number; min?: num
   );
 }
 
+function BalanceV({ left, right, tilt = "level" }: { left: string; right: string; tilt?: "left" | "right" | "level" }) {
+  const ang = tilt === "left" ? 7 : tilt === "right" ? -7 : 0; // positive = left side down
+  const L = 120, cx = 170;
+  const dy = Math.sin((ang * Math.PI) / 180) * L, dx = Math.cos((ang * Math.PI) / 180) * L;
+  const lx = cx - dx, ly = 62 + dy, rx = cx + dx, ry = 62 - dy;
+  const pan = (x: number, y: number, txt: string) => (
+    <g>
+      <line x1={x} y1={y} x2={x - 34} y2={y + 36} stroke="#fff" strokeOpacity={0.6} /><line x1={x} y1={y} x2={x + 34} y2={y + 36} stroke="#fff" strokeOpacity={0.6} />
+      <rect x={x - 42} y={y + 36} width={84} height={34} rx={8} fill="#182848" stroke={GOLD} strokeOpacity={0.7} />
+      <text x={x} y={y + 58} textAnchor="middle" fill="#fff" fontSize={txt.length > 9 ? 11 : 14} fontWeight={600}>{txt}</text>
+    </g>
+  );
+  return (
+    <svg viewBox="0 0 340 170" className="w-full max-w-md" role="img" aria-label={`Balansvåg: ${left} mot ${right}`}>
+      <polygon points={`${cx},62 ${cx - 16},150 ${cx + 16},150`} fill="#223660" />
+      <line x1={lx} y1={ly} x2={rx} y2={ry} stroke={GOLD} strokeWidth={4} strokeLinecap="round" />
+      <circle cx={cx} cy={62} r={6} fill={GOLD} />
+      {pan(lx, ly, left)}{pan(rx, ry, right)}
+      <rect x={cx - 50} y={150} width={100} height={8} rx={4} fill="#223660" />
+    </svg>
+  );
+}
+
+function DotPatternV({ figures }: { figures: number[][] }) {
+  const s = 15, gap = 26;
+  const maxH = Math.max(...figures.flat(), 1);
+  const widths = figures.map((f) => f.length * s);
+  const total = widths.reduce((a, b) => a + b, 0) + gap * (figures.length - 1);
+  let x = 0;
+  return (
+    <svg viewBox={`0 0 ${total + 4} ${maxH * s + 26}`} className="w-full max-w-md" role="img" aria-label="Figurer av rutor">
+      {figures.map((f, fi) => {
+        const x0 = x; x += widths[fi] + gap;
+        return (
+          <g key={fi}>
+            {f.map((h, c) => Array.from({ length: h }, (_, r) => <rect key={`${c}-${r}`} x={x0 + c * s} y={maxH * s - (r + 1) * s} width={s - 1.5} height={s - 1.5} rx={2} fill="#3b82f6" fillOpacity={0.8} stroke="#fff" strokeOpacity={0.4} strokeWidth={0.6} />))}
+            <text x={x0 + widths[fi] / 2} y={maxH * s + 16} textAnchor="middle" fill="#8d99b3" fontSize={11}>Figur {fi + 1}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
 function AreaV({ a, b }: { a: number; b: number }) {
   const c = Math.min(26, 280 / Math.max(a, 1), 160 / Math.max(b, 1));
   return (
@@ -263,6 +307,8 @@ export function VisualView({ v }: { v: Visual }) {
     case "decimalplace": return <DecimalPlaceV value={v.value} />;
     case "decimalgrid": return <DecimalGridV hundredths={v.hundredths} />;
     case "thermometer": return <ThermometerV value={v.value} min={v.min} max={v.max} />;
+    case "balance": return <BalanceV left={v.left} right={v.right} tilt={v.tilt} />;
+    case "dotpattern": return <DotPatternV figures={v.figures} />;
     case "percentbar": return <PercentBarV pct={v.pct} label={v.label} />;
     case "doublenumberline": return <DoubleLineV total={v.total} unit={v.unit} hideTotal={v.hideTotal} marks={v.marks} />;
     case "fractioncircle": return <FractionCircleV parts={v.parts} shaded={v.shaded} />;

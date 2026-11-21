@@ -20,6 +20,8 @@ export type Visual =
   | { type: "decimalplace"; value: string }
   | { type: "decimalgrid"; hundredths: number }
   | { type: "thermometer"; value: number; min?: number; max?: number }
+  | { type: "balance"; left: string; right: string; tilt?: "left" | "right" | "level" }
+  | { type: "dotpattern"; figures: number[][] }
   | { type: "percentbar"; pct: number; label?: string }
   | { type: "doublenumberline"; total: number; unit?: string; hideTotal?: boolean; marks: { pct: number; showAmount?: boolean }[] }
   | { type: "area"; a: number; b: number }
@@ -38,6 +40,7 @@ export type ExerciseSpec =
   | { kind: "areamodel"; id: string; skill: string; prompt: string; a: number; b: number; aParts: number[]; bParts: number[] }
   | { kind: "longdiv"; id: string; skill: string; prompt: string; a: number; b: number; p0: number }
   | { kind: "gridshade"; id: string; skill: string; prompt: string }
+  | { kind: "expr"; id: string; skill: string; prompt: string; variable: string; visual?: Visual }
   | { kind: "multifield"; id: string; skill: string; prompt: string; fields: { label: string; suffix?: string }[]; visual?: Visual }
   | { kind: "text"; id: string; skill: string; prompt: string; scenario?: string; minChars: number };
 
@@ -50,6 +53,7 @@ export type Answer =
   | { kind: "areamodel"; cells: string[]; total: string }
   | { kind: "longdiv"; q: string[]; prod: string[]; rem: string[] }
   | { kind: "gridshade"; value: number }
+  | { kind: "expr"; value: string }
   | { kind: "multifield"; values: string[] }
   | { kind: "text"; value: string };
 
@@ -63,6 +67,7 @@ export type Solution =
   | { kind: "areamodel"; cells: string[]; total: string }
   | { kind: "longdiv"; q: string[]; prod: string[]; rem: string[]; quotient: number; remainder: number }
   | { kind: "gridshade"; value: number }
+  | { kind: "expr"; accept: string; simplified?: boolean }
   | { kind: "multifield"; values: string[][] } // each field: list of accepted values
   | { kind: "text"; rubric: Rubric; modelAnswer: string };
 

@@ -19,6 +19,7 @@ export function emptyAnswer(spec: ExerciseSpec): Answer {
     case "areamodel": return { kind: "areamodel", cells: [], total: "" };
     case "longdiv": return { kind: "longdiv", q: [], prod: [], rem: [] };
     case "gridshade": return { kind: "gridshade", value: 0 };
+    case "expr": return { kind: "expr", value: "" };
     case "multifield": return { kind: "multifield", values: spec.fields.map(() => "") };
     case "text": return { kind: "text", value: "" };
   }
@@ -31,6 +32,7 @@ export function isAnswered(spec: ExerciseSpec, a: Answer | undefined): boolean {
     case "numeric": return a.value.trim() !== "";
     case "column": return a.result.trim() !== "";
     case "fractionbar": case "gridshade": return a.value > 0;
+    case "expr": return a.value.trim() !== "";
     case "areamodel": return a.total.trim() !== "";
     case "longdiv": return a.q.some((x) => (x ?? "").trim() !== "");
     case "multifield": return a.values.some((v) => v.trim() !== "");
@@ -197,6 +199,24 @@ function LongDivInput({ spec, value, onChange, disabled }: ExProps & { spec: Ext
   );
 }
 
+/* ───────── algebraic expression ───────── */
+function ExprInput({ spec, value, onChange, disabled }: ExProps & { spec: Extract<ExerciseSpec, { kind: "expr" }> }) {
+  const v = value?.kind === "expr" ? value.value : "";
+  const add = (t: string) => onChange({ kind: "expr", value: v + t });
+  const chip = "btn btn-ghost min-h-[44px] min-w-[44px] px-3 text-lg";
+  return (
+    <div className="space-y-2">
+      <input className="field text-lg" disabled={disabled} inputMode="text" autoCapitalize="none" autoCorrect="off" spellCheck={false} autoComplete="off" aria-label="Ditt uttryck" placeholder={`Skriv ditt uttryck med ${spec.variable}`}
+        value={v} onChange={(e) => onChange({ kind: "expr", value: e.target.value })} />
+      <div className="flex flex-wrap gap-1.5" aria-label="Snabbknappar">
+        {[spec.variable, "+", "\u2212", "\u00b7", "(", ")"].map((t) => <button key={t} type="button" className={chip} disabled={disabled} onClick={() => add(t)}>{t}</button>)}
+        <button type="button" className={chip} disabled={disabled} onClick={() => onChange({ kind: "expr", value: v.slice(0, -1) })} aria-label="Radera sista tecknet">⌫</button>
+      </div>
+      <p className="text-xs text-[#8d99b3]">Skriv t.ex. 3{spec.variable}+2. Både 3{spec.variable} och 3·{spec.variable} fungerar.</p>
+    </div>
+  );
+}
+
 /* ───────── 10x10 grid shading ───────── */
 function GridShadeInput({ value, onChange, disabled }: ExProps) {
   const n = value?.kind === "gridshade" ? value.value : 0;
@@ -289,6 +309,7 @@ export function ExerciseView({ spec, value, onChange, disabled }: ExProps) {
       {spec.kind === "areamodel" && <AreaInput {...props} spec={spec} />}
       {spec.kind === "longdiv" && <LongDivInput {...props} spec={spec} />}
       {spec.kind === "gridshade" && <GridShadeInput {...props} />}
+      {spec.kind === "expr" && <ExprInput {...props} spec={spec} />}
       {spec.kind === "fractionbar" && (
         <div className="space-y-2">
           <FractionBarV parts={spec.parts} shaded={value?.kind === "fractionbar" ? value.value : 0} onToggle={disabled ? undefined : (i) => onChange({ kind: "fractionbar", value: value?.kind === "fractionbar" && value.value === i + 1 ? i : i + 1 })} />
