@@ -41,9 +41,9 @@ kravinnehåll.
 | Centralt innehåll | Var | Status |
 |---|---|---|
 | Två- och tredimensionella objekt, konstruktion | V10 L1 (månghörningar, trianglar, fyrhörningar), L9 (cirkel, kroppar) | ✅ (egenskaper) · konstruktion med passare/linjal 🚧 |
-| Jämförelse, uppskattning, mätning av längd, area, massa, volym, tid och vinkel; enhetsbyten | V10 L2–L6 (omkrets, area, volym, vinklar med gradskiva), V11 (massa, tid, enhetsbyten) | V10 ✅ · V11 🚧 |
+| Jämförelse, uppskattning, mätning av längd, area, massa, volym, tid och vinkel; enhetsbyten | V10 L2–L6 (omkrets, area, volym, vinklar med gradskiva), V11 L1–L8 (längd, massa, volym, tid, area, enhetsbyten, uppskattning) | ✅ |
 | Omkrets och area hos tvådimensionella figurer | V10 L2 (omkrets), L3 (area), L4 (parallellogram och trianglar) | ✅ |
-| Skala vid förminskning och förstoring | V11 | 🚧 |
+| Skala vid förminskning och förstoring | V11 L6 (ritningar, kartor, förstoring 10:1) | ✅ |
 | Symmetri i planet | V10 L7 (symmetrilinjer, spegling i lodrät/vågrät linje) | ✅ (linjesymmetri) |
 | Slumpmässiga händelser, chans och risk; jämföra sannolikhet | V12 | 🚧 |
 | Enkel kombinatorik | V12 | 🚧 |

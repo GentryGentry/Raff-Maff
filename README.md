@@ -88,7 +88,7 @@ fel → tillbaka till 1 dag), (2) underkända kunskapsprov, (3) svaga färdighet
 ## Test
 
 ```bash
-npm test                              # enhetstester: ~840 tester – alla generatorer × 150 frön × 3 nivåer, bedömning, tröskelvärden
+npm test                              # enhetstester: ~940 tester – alla generatorer × 150 frön × 3 nivåer, bedömning, tröskelvärden
 npm run dev                           # i en terminal
 npx tsx scripts/api-e2e.ts            # mot körande dev-server: upplåsning, replay/förfalskning, XP, hela genomspelet av alla byggda världar
 npx tsx scripts/ui-column.ts <mapp>   # styr riktiga UI:t (iPhone-emulering) och löser en uppställningsuppgift
@@ -118,7 +118,7 @@ public/sw.js          Service worker
 
 **Byggt och testat**
 - Hela appskalet (Hem, Världskarta, Lärarakademin, Repetition, Profil, Räkneyta, AI-handledare, inloggning).
-- **Värld 1 (9 lektioner), Värld 2 (7) och Värld 3 – Multiplikation (6) och Värld 4 – Division (7) och Värld 5 – Bråk (7) och Värld 6 – Decimaltal (8) och Värld 7 – Procent (10) och Värld 8 – Negativa tal (6) och Värld 9 – Algebra och mönster (9) och Värld 10 – Geometri (9)** med alla 11 lektionssteg, genererade uppgifter,
+- **Värld 1 (9 lektioner), Värld 2 (7) och Värld 3 – Multiplikation (6) och Värld 4 – Division (7) och Värld 5 – Bråk (7) och Värld 6 – Decimaltal (8) och Värld 7 – Procent (10) och Värld 8 – Negativa tal (6) och Värld 9 – Algebra och mönster (9) och Värld 10 – Geometri (9) och Värld 11 – Enheter och mätning (8)** med alla 11 lektionssteg, genererade uppgifter,
   fyrdelad slutbedömning, lärarutmaningar med elevfall, och bossutmaningar.
 - Server-side rättning, upplåsning, XP/nivåer/streak, 13 märken, mastery, repetition – genomspelade i `api-e2e`.
 - Strukturerad uppställning (minnessiffror/växling/delprodukter), areamodell, tallinje, bråkstapel, Konva-rityta.
@@ -133,11 +133,12 @@ public/sw.js          Service worker
   Offline fungerar för sidor som besökts tidigare; prov kräver alltid internet.
 
 **Inte byggt**
-- **Världarna 11–13** finns på kartan som planerade (🚧) men har **inget innehåll**. De går inte att öppna och ger
+- **Världarna 12–13** finns på kartan som planerade (🚧) men har **inget innehåll**. De går inte att öppna och ger
   inga framsteg. Se `docs/lgr22-mapping.md` för vad som återstår. Innehållsmodellen är gjord för att fler lektioner
-  läggs till som TypeScript-filer i `src/lib/content/` (se `w2/`–`w10/` som mall).
+  läggs till som TypeScript-filer i `src/lib/content/` (se `w2/`–`w11/` som mall).
 - Frihandsritning bedöms inte automatiskt (se ovan). Algebrauttryck ("3n+2") bedöms av en egen säker parser (ingen `eval`): olika skrivsätt godkänns, och "förenkla"-uppgifter kräver förenklad form.
 - Geometribilder (månghörningar, vinklar med gradskiva, rätblock, kroppar, koordinatsystem) är ritade i SVG och kontrolleras av `tests/geometry.test.ts`, som räknar om svaren ur bildernas egna koordinater (areor, avstånd, vinklar, spegling). Uppgifterna med "tryck i koordinatsystemet" rättas exakt (rätt punkt eller inte). Bilder av kroppar (prisma, pyramid, kon, cylinder) är schematiska teckningar och inte skalenliga.
+- Värld 11: alla enhetsomvandlingar bygger på heltalsaritmetik (inga flyttalsfel) och kontrolleras av `tests/units.test.ts` mot en separat enhetstabell. Linjalen och den analoga klockan är SVG-bilder; hastighet (km/h) ingår bara som enkel proportionalitet.
 - Programmering/algoritmer (står i Lgr22) saknas bland de 13 världarna.
 - Lärarförklaringar bedöms med en regelbaserad rubrik (begrepp + minimilängd + skydd mot nyckelordsfyllning) och, med
   OpenAI-nyckel, en AI-granskning som kan underkänna. Rubriken är en approximation och kan missa korrekta men

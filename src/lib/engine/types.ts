@@ -52,6 +52,8 @@ export type Visual =
   | { type: "angle"; deg: number; protractor?: boolean; base?: "left" | "right"; label?: string }
   | ({ type: "coordplane" } & PlaneSpec)
   | { type: "cuboid"; l: number; b: number; h: number; labels?: [string, string, string] }
+  | { type: "ruler"; cm: number; from: number; to: number } // from/to in mm
+  | { type: "clock"; h: number; m: number }
   | { type: "circle"; line: "radius" | "diameter" | "both"; rLabel?: string; dLabel?: string }
   | { type: "solid"; shape: "cylinder" | "cone" | "pyramid" | "sphere" | "prism" | "cube" | "cuboid" };
 

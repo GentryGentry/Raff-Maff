@@ -283,3 +283,39 @@ export function CircleV({ line, rLabel, dLabel }: { line: "radius" | "diameter" 
     </svg>
   );
 }
+
+/** Ruler with mm ticks; a gold bar shows an object from `from` to `to` (mm). */
+export function RulerV({ cm, from, to }: { cm: number; from: number; to: number }) {
+  const W = 320, x0 = 14, px = (W - 2 * x0) / (cm * 10), top = 52, X = (mm: number) => x0 + mm * px;
+  return (
+    <svg viewBox={`0 0 ${W} 100`} className="w-full max-w-sm" role="img" aria-label="Linjal med ett föremål">
+      <rect x={X(from)} y={14} width={X(to) - X(from)} height={20} rx={4} fill={GOLD} fillOpacity={0.9} />
+      <line x1={X(from)} y1={34} x2={X(from)} y2={top} stroke={GOLD} strokeDasharray="3 3" />
+      <line x1={X(to)} y1={34} x2={X(to)} y2={top} stroke={GOLD} strokeDasharray="3 3" />
+      <rect x={x0 - 6} y={top} width={cm * 10 * px + 12} height={42} rx={4} fill="#182848" stroke={LINE} />
+      {Array.from({ length: cm * 10 + 1 }, (_, i) => {
+        const big = i % 10 === 0, mid = i % 5 === 0;
+        return <line key={i} x1={X(i)} y1={top} x2={X(i)} y2={top + (big ? 18 : mid ? 13 : 8)} stroke="#fff" strokeOpacity={big ? 0.95 : 0.6} strokeWidth={big ? 1.4 : 0.8} />;
+      })}
+      {Array.from({ length: cm + 1 }, (_, i) => <text key={i} x={X(i * 10)} y={top + 34} textAnchor="middle" fill="#fff" fontSize={11}>{i}</text>)}
+    </svg>
+  );
+}
+
+/** Analogue clock face. */
+export function ClockV({ h, m }: { h: number; m: number }) {
+  const cx = 90, cy = 90, r = 76;
+  const pt = (deg: number, len: number): P2 => [cx + len * Math.sin((deg * Math.PI) / 180), cy - len * Math.cos((deg * Math.PI) / 180)];
+  const hd = ((h % 12) * 30 + m * 0.5), md = m * 6;
+  const hp = pt(hd, r * 0.36), mp = pt(md, r * 0.64);
+  return (
+    <svg viewBox="0 0 180 180" className="w-full max-w-[13rem]" role="img" aria-label="Analog klocka">
+      <circle cx={cx} cy={cy} r={r} fill="#182848" stroke="#fff" strokeWidth={2.5} />
+      {Array.from({ length: 60 }, (_, i) => { const a = pt(i * 6, r - 2), b = pt(i * 6, r - (i % 5 === 0 ? 9 : 5)); return <line key={i} x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke="#fff" strokeOpacity={0.7} strokeWidth={i % 5 === 0 ? 1.6 : 0.7} />; })}
+      {Array.from({ length: 12 }, (_, i) => { const p = pt((i + 1) * 30, r - 21); return <text key={i} x={p[0]} y={p[1] + 5} textAnchor="middle" fill="#fff" fontSize={14} fontWeight={600}>{i + 1}</text>; })}
+      <line x1={cx} y1={cy} x2={hp[0]} y2={hp[1]} stroke="#fff" strokeWidth={5} strokeLinecap="round" />
+      <line x1={cx} y1={cy} x2={mp[0]} y2={mp[1]} stroke={GOLD} strokeWidth={3} strokeLinecap="round" />
+      <circle cx={cx} cy={cy} r={4} fill={GOLD} />
+    </svg>
+  );
+}
