@@ -12,9 +12,10 @@ Status: ✅ byggd lektion · 🚧 planerad (värld finns på kartan men saknar i
 | Rationella tal, däribland negativa tal, och deras egenskaper samt hur talen kan delas upp och användas | V1 L1–L3, L8 (egenskaper – *fördjupning*, se not); V5 L2–L4, L6 (bråk som tal: tallinje, likvärdiga bråk, jämförelse, blandad form); V8 negativa tal | V1, V5 ✅ · V8 🚧 |
 | Positionssystemet för hela tal och tal i decimalform | V1 L1–L3, L7; V6 L1–L3, L5 (tiondelar, hundradelar, tallinje, jämförelse, gånger/delat med 10, 100, 1 000) | V1, V6 ✅ |
 | Olika talsystem och några talsystem som används i olika kulturer genom historien | V1 L9 (romerska siffror, babyloniskt/egyptiskt/indiskt) | ✅ |
-| Tal i procentform och deras samband med tal i bråk- och decimalform | V7 | 🚧 |
+| Tal i procentform och deras samband med tal i bråk- och decimalform | V7 L1–L2 (procent som hundradelar, bråk ↔ decimaltal ↔ procent), V7 L3–L7, L9–L10 (procent av, andel, helhet, jämförelse, vardag) | ✅ |
+| Procentuell förändring (rabatt, prisökning) | V7 L8 – *fördjupning*: nämns inte uttryckligen i centralt innehåll åk 4–6 (förändringsfaktor hör till åk 7–9), men är vardagsnära och hjälper förståelsen | ✅ (fördjupning) |
 | Hur tal i bråk- och decimalform kan användas i vardagliga situationer | V5 L1, L5, L7; V6 L4, L8 (pengar, längd, vikt) | V5, V6 ✅ |
-| Tal i bråk- och decimalform och deras samband (med procent i V7) | V6 L7 (bråk ↔ decimaltal) | V6 ✅ · procent 🚧 |
+| Tal i bråk- och decimalform och deras samband (med procent i V7) | V6 L7 (bråk ↔ decimaltal), V7 L2 (bråk ↔ decimaltal ↔ procent) | ✅ |
 | De fyra räknesätten och regler för deras användning vid beräkningar med naturliga tal | V2 L5, V3 L1–L6 (grupper, tabellstrategier, areamodell, uppställning, räknelagar/räkneordning), V4 L1–L7 (delning/innehåll, samband med multiplikation, rest, tiotal, liggande stolen, tvåsiffrig delare, rimlighet) | V2–4 ✅ |
 | Metoder för beräkningar med naturliga tal och enkla tal i bråk- och decimalform vid överslagsräkning, huvudräkning och skriftlig beräkning; digitala verktyg | V2 L1–L4, L6 (överslag); V3 L2–L5 (huvudräkning, skriftlig multiplikation, överslag); V4 L4–L7 (huvudräkning, skriftlig division, överslag); V5 L5 (addition/subtraktion av bråk); V6 L4, L6, L8 (decimaltal: skriftlig addition/subtraktion, avrundning, överslag, gånger/delat med heltal) | V2–4 ✅ (naturliga tal) · V5–6 ✅ |
 | Rimlighetsbedömning vid uppskattningar och beräkningar | V2 L6, V1 L6, V2 L7, V4 L7 | ✅ |
@@ -46,7 +47,7 @@ kravinnehåll.
 | Enkel kombinatorik | V12 | 🚧 |
 | Tabeller och diagram; tolkning av data | V12 | 🚧 |
 | Lägesmått: medelvärde, typvärde, median | V12 | 🚧 |
-| Proportionalitet i bråk-, decimal- och procentform | **Saknar egen värld** – föreslås i V7 (procent); bråk som förhållande/del av antal grundlagt i V5 L7 | 🚧 |
+| Proportionalitet i bråk-, decimal- och procentform | V7 L5 (dubbel tallinje, proportionalitet i procentform), V7 L3–L4, L7; bråk som del av antal i V5 L7 | ✅ (procent) · grafer 🚧 |
 | Koordinatsystem och gradering av koordinataxlar | **Saknar egen värld** – föreslås i V10 (geometri) | 🚧 |
 | Grafer för proportionella samband | **Saknar egen värld** – föreslås i V12 | 🚧 |
 | Strategier för att lösa matematiska problem; formulera frågeställningar | V2 L7, V13 | V2 L7 ✅ |
