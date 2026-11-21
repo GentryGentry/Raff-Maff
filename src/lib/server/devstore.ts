@@ -1,4 +1,5 @@
 import { promises as fs } from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import type { AttemptRow, Profile, ProgressRow, RevisionItem, SkillStat, Store } from "./types";
 
@@ -11,7 +12,9 @@ interface Db {
   revision: RevisionItem[];
   achievements: { user_id: string; achievement_id: string; unlocked_at: string }[];
 }
-const FILE = path.join(process.cwd(), ".data", "dev-store.json");
+/** Kept OUTSIDE the project folder so the dev server's file watcher never sees it change (otherwise every write
+ *  triggers a rebuild + page reload, which calls the API again, which writes again …). */
+const FILE = process.env.DEV_STORE_PATH || path.join(os.homedir(), ".raff-maff-dev", "dev-store.json");
 const empty = (): Db => ({ profiles: {}, progress: [], attempts: [], skills: [], revision: [], achievements: [] });
 
 let queue: Promise<unknown> = Promise.resolve();
@@ -32,10 +35,15 @@ const mut = <T>(fn: (db: Db) => T): Promise<T> => serial(async () => { const db 
 const read = <T>(fn: (db: Db) => T): Promise<T> => serial(async () => fn(await load()));
 
 export const devStore: Store = {
-  ensureProfile: (id, name) => mut((db) => {
-    db.profiles[id] ??= { id, display_name: name || "Läraren", xp: 0, streak: 0, longest_streak: 0, last_active_date: null, current_lesson_id: null, created_at: new Date().toISOString() };
-    return db.profiles[id];
-  }),
+  // Read-only when the profile already exists (no file write on every page load).
+  ensureProfile: async (id, name) => {
+    const existing = await read((db) => db.profiles[id]);
+    if (existing) return existing;
+    return mut((db) => {
+      db.profiles[id] ??= { id, display_name: name || "Läraren", xp: 0, streak: 0, longest_streak: 0, last_active_date: null, current_lesson_id: null, created_at: new Date().toISOString() };
+      return db.profiles[id];
+    });
+  },
   saveProfile: (p) => mut((db) => { db.profiles[p.id] = p; }),
   listProgress: (u) => read((db) => db.progress.filter((r) => r.user_id === u)),
   saveProgress: (row) => mut((db) => { const i = db.progress.findIndex((r) => r.user_id === row.user_id && r.lesson_id === row.lesson_id); if (i >= 0) db.progress[i] = row; else db.progress.push(row); }),

@@ -21,7 +21,7 @@ npm run dev
 ```
 
 Öppna http://localhost:3000. **Utan Supabase-nycklar körs appen i lokalt dev-läge:** ingen inloggning, och framsteg
-sparas i `.data/dev-store.json` (aldrig i produktion). Det här läget är till för utveckling och test.
+sparas i `~/.raff-maff-dev/dev-store.json` utanför projektmappen (aldrig i produktion; `npm run dev:reset` nollställer). Det här läget är till för utveckling och test.
 
 ### Sätt upp för riktig användning (en användare)
 

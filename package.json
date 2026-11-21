@@ -5,6 +5,7 @@
   "description": "Raff Maff – matematik för årskurs 4–6 och lärarens didaktik",
   "scripts": {
     "dev": "next dev",
+    "dev:reset": "rm -rf ~/.raff-maff-dev",
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",

@@ -29,7 +29,7 @@ export default function Login() {
       <div className="text-center"><div className="text-5xl">🧮</div><h1 className="mt-2 text-4xl font-bold tracking-tight">Raff <span className="text-[#e8b64a]">Maff</span></h1><p className="mt-2 text-[#8d99b3]">Matematik för åk 4–6 – och konsten att lära ut den.</p></div>
       {cfg && !cfg.passcode ? (
         <div className="card space-y-3 p-5 text-center">
-          <p>{cfg.dev ? "Lokalt utvecklingsläge: ingen åtkomstkod är satt, så du kommer in direkt. Framsteg sparas i .data/dev-store.json." : "Servern saknar APP_PASSCODE. Sätt den som miljövariabel (se README) och starta om."}</p>
+          <p>{cfg.dev ? "Lokalt utvecklingsläge: ingen åtkomstkod är satt, så du kommer in direkt. Framsteg sparas lokalt i ~/.raff-maff-dev/." : "Servern saknar APP_PASSCODE. Sätt den som miljövariabel (se README) och starta om."}</p>
           {cfg.dev && <Link className="btn btn-gold" href="/">Fortsätt</Link>}
         </div>
       ) : (
