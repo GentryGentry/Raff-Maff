@@ -6,7 +6,7 @@ import type { ClientState } from "@/lib/server/actions";
 const CACHE_KEY = "raffmaff.state.v1";
 const OUTBOX_KEY = "raffmaff.outbox.v1";
 
-type Ctx = { state: ClientState | null; loading: boolean; offline: boolean; error: string | null; refresh: () => Promise<void>; config: { auth: boolean; dev: boolean; ai: boolean } | null };
+type Ctx = { state: ClientState | null; loading: boolean; offline: boolean; error: string | null; refresh: () => Promise<void>; config: { passcode: boolean; db: boolean; dev: boolean; ai: boolean } | null };
 const StateCtx = createContext<Ctx>({ state: null, loading: true, offline: false, error: null, refresh: async () => {}, config: null });
 export const useAppState = () => useContext(StateCtx);
 

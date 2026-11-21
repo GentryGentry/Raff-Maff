@@ -5,7 +5,6 @@ import { Bar, PageHeader, Pill, Spinner } from "@/components/ui";
 import { useAppState } from "@/lib/client/state";
 import { WORLDS } from "@/lib/content";
 import { MASTERY_LABEL, SECTION_NAME, titleOf } from "@/lib/client/labels";
-import { createBrowserClient } from "@supabase/ssr";
 
 export default function Profile() {
   const { state, loading, config, offline } = useAppState();
@@ -13,8 +12,9 @@ export default function Profile() {
   if (loading || !state) return <Spinner />;
   const { profile, level } = state;
   const logout = async () => {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL, key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (url && key) { await createBrowserClient(url, key).auth.signOut(); try { localStorage.clear(); } catch { /* ignore */ } router.replace("/login"); }
+    await fetch("/api/logout", { method: "POST" }).catch(() => {});
+    try { localStorage.clear(); } catch { /* ignore */ }
+    router.replace("/login");
   };
   return (
     <div className="pb-6">
@@ -50,9 +50,9 @@ export default function Profile() {
 
         <section className="card space-y-2 p-5"><div className="font-semibold">Installera på iPhone</div>
           <ol className="list-decimal space-y-1 pl-5 text-sm text-[#c3cce0]"><li>Öppna appen i Safari.</li><li>Tryck på Dela-ikonen.</li><li>Välj &ldquo;Lägg till på hemskärmen&rdquo;.</li></ol>
-          <p className="text-xs text-[#8d99b3]">{offline ? "Offline just nu." : "Besökta lektioner fungerar även offline."} Framsteg lagras på servern{config?.dev ? " (lokalt dev-läge, ingen inloggning)" : ""}.</p></section>
+          <p className="text-xs text-[#8d99b3]">{offline ? "Offline just nu." : "Besökta lektioner fungerar även offline."} Framsteg lagras på servern{config?.dev ? " (lokalt dev-läge, ingen åtkomstkod)" : ""}.</p></section>
 
-        {config?.auth && <button className="btn btn-ghost w-full" onClick={logout}>Logga ut</button>}
+        {config?.passcode && <button className="btn btn-ghost w-full" onClick={logout}>Lås appen (logga ut)</button>}
       </div>
     </div>
   );

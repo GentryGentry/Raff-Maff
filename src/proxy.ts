@@ -1,31 +1,18 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { passcodeRequired } from "@/lib/server/config";
+import { COOKIE, verifySessionValue } from "@/lib/server/session";
 
-/** Keeps the Supabase session cookie fresh. No-op when Supabase is not configured (local dev). */
+/** Sends visitors without a valid access-code cookie to /login. API routes enforce the same rule themselves (401). */
 export async function proxy(request: NextRequest) {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  let response = NextResponse.next({ request });
-  if (!url || !key) return response;
-  const supabase = createServerClient(url, key, {
-    cookies: {
-      getAll: () => request.cookies.getAll(),
-      setAll: (list) => {
-        list.forEach(({ name, value }) => request.cookies.set(name, value));
-        response = NextResponse.next({ request });
-        list.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
-      },
-    },
-  });
-  const { data } = await supabase.auth.getUser();
   const path = request.nextUrl.pathname;
-  const open = path.startsWith("/login") || path.startsWith("/api/config") || path.startsWith("/offline");
-  if (!data.user && !open && !path.startsWith("/api/")) {
-    const redirect = request.nextUrl.clone();
-    redirect.pathname = "/login";
-    return NextResponse.redirect(redirect);
-  }
-  return response;
+  const open = path.startsWith("/login") || path.startsWith("/api/") || path.startsWith("/offline");
+  if (open) return NextResponse.next();
+  if (!passcodeRequired() && process.env.NODE_ENV !== "production") return NextResponse.next(); // local dev without a code
+  if (passcodeRequired() && (await verifySessionValue(request.cookies.get(COOKIE)?.value))) return NextResponse.next();
+  const url = request.nextUrl.clone();
+  url.pathname = "/login";
+  url.search = "";
+  return NextResponse.redirect(url);
 }
 
 export const config = {

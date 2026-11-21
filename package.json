@@ -13,7 +13,6 @@
     "icons": "node scripts/make-icons.mjs"
   },
   "dependencies": {
-    "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.119.2",
     "katex": "^0.19.1",
     "konva": "^10.10.0",
