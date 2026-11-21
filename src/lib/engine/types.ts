@@ -9,6 +9,17 @@ export const SECTION_LABEL: Record<Section, string> = {
   pedagogy: "Pedagogik",
 };
 
+export type P2 = [number, number];
+/** A first-quadrant coordinate plane with optional shown points, polygon and mirror line. */
+export interface PlaneSpec {
+  xmax: number;
+  ymax: number;
+  points?: { x: number; y: number; label?: string }[];
+  poly?: P2[];
+  mirrorX?: number; // vertical mirror line x = m
+  mirrorY?: number; // horizontal mirror line y = m
+}
+
 export type Visual =
   | { type: "placevalue"; value: number }
   | { type: "baseten"; value: number }
@@ -26,7 +37,23 @@ export type Visual =
   | { type: "doublenumberline"; total: number; unit?: string; hideTotal?: boolean; marks: { pct: number; showAmount?: boolean }[] }
   | { type: "area"; a: number; b: number }
   | { type: "grouping"; value: number }
-  | { type: "compare"; a: number; b: number };
+  | { type: "compare"; a: number; b: number }
+  | {
+      type: "polygon";
+      pts: P2[]; // math coordinates (y up); may be fractional for regular polygons
+      grid?: boolean; // draw unit grid over the figure's bounding box
+      sides?: string[]; // label per side i (pts[i] -> pts[i+1]); "" = none
+      right?: number[]; // vertex indices that get a right-angle mark
+      ticks?: number[]; // equal-side tick marks per side i (0..3)
+      vlabels?: string[]; // vertex letters
+      angles?: { at: number; text: string }[]; // angle labels inside vertex
+      dash?: { a: P2; b: P2; label?: string }[]; // dashed helper lines (height, axis, diagonal)
+    }
+  | { type: "angle"; deg: number; protractor?: boolean; base?: "left" | "right"; label?: string }
+  | ({ type: "coordplane" } & PlaneSpec)
+  | { type: "cuboid"; l: number; b: number; h: number; labels?: [string, string, string] }
+  | { type: "circle"; line: "radius" | "diameter" | "both"; rLabel?: string; dLabel?: string }
+  | { type: "solid"; shape: "cylinder" | "cone" | "pyramid" | "sphere" | "prism" | "cube" | "cuboid" };
 
 export type ColumnOp = "add" | "sub" | "mul";
 
@@ -40,6 +67,7 @@ export type ExerciseSpec =
   | { kind: "areamodel"; id: string; skill: string; prompt: string; a: number; b: number; aParts: number[]; bParts: number[] }
   | { kind: "longdiv"; id: string; skill: string; prompt: string; a: number; b: number; p0: number }
   | { kind: "gridshade"; id: string; skill: string; prompt: string }
+  | { kind: "point"; id: string; skill: string; prompt: string; plane: PlaneSpec }
   | { kind: "expr"; id: string; skill: string; prompt: string; variable: string; visual?: Visual }
   | { kind: "multifield"; id: string; skill: string; prompt: string; fields: { label: string; suffix?: string }[]; visual?: Visual }
   | { kind: "text"; id: string; skill: string; prompt: string; scenario?: string; minChars: number };
@@ -53,6 +81,7 @@ export type Answer =
   | { kind: "areamodel"; cells: string[]; total: string }
   | { kind: "longdiv"; q: string[]; prod: string[]; rem: string[] }
   | { kind: "gridshade"; value: number }
+  | { kind: "point"; x: number | null; y: number | null }
   | { kind: "expr"; value: string }
   | { kind: "multifield"; values: string[] }
   | { kind: "text"; value: string };
@@ -67,6 +96,7 @@ export type Solution =
   | { kind: "areamodel"; cells: string[]; total: string }
   | { kind: "longdiv"; q: string[]; prod: string[]; rem: string[]; quotient: number; remainder: number }
   | { kind: "gridshade"; value: number }
+  | { kind: "point"; x: number; y: number }
   | { kind: "expr"; accept: string; simplified?: boolean }
   | { kind: "multifield"; values: string[][] } // each field: list of accepted values
   | { kind: "text"; rubric: Rubric; modelAnswer: string };

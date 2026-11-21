@@ -50,6 +50,8 @@ function expectedAnswerText(sol: Solution, spec: ConcreteExercise["spec"]): stri
       return `${sol.cells.join(", ")} → ${sol.total}`;
     case "expr":
       return sol.accept;
+    case "point":
+      return `(${sol.x}, ${sol.y})`;
     case "longdiv":
       return `${sol.quotient}${sol.remainder ? ` rest ${sol.remainder}` : ""}`;
     case "multifield":
@@ -84,6 +86,13 @@ export function gradeExercise(ex: ConcreteExercise, ans: Answer | undefined): It
       const a = ans as { value: number | null };
       const ok = a.value != null && Math.abs(a.value - sol.value) < 1e-9;
       return ok ? { ...base, points: 1, max: 1, correct: true, feedback: "Rätt!" } : wrong("Inte riktigt.");
+    }
+    case "point": {
+      const a = ans as Extract<Answer, { kind: "point" }>;
+      if (a.x == null || a.y == null) return wrong("Tryck på en punkt i koordinatsystemet.");
+      if (a.x === sol.x && a.y === sol.y) return { ...base, points: 1, max: 1, correct: true, feedback: "Rätt!" };
+      const hint = a.y === sol.y ? "x-värdet stämmer inte." : a.x === sol.x ? "y-värdet stämmer inte." : a.x === sol.y && a.y === sol.x ? "Du har bytt plats på x och y: gå först åt sidan (x), sedan uppåt (y)." : "Gå först åt sidan (x) och sedan uppåt (y).";
+      return wrong(`Inte riktigt. ${hint}`);
     }
     case "multifield": {
       const a = ans as Extract<Answer, { kind: "multifield" }>;
@@ -191,6 +200,7 @@ export function perfectAnswer(ex: ConcreteExercise): Answer {
     case "fractionbar": return { kind: "fractionbar", value: s.value };
     case "gridshade": return { kind: "gridshade", value: s.value };
     case "expr": return { kind: "expr", value: s.accept };
+    case "point": return { kind: "point", x: s.x, y: s.y };
     case "column": return { kind: "column", result: s.result, carries: s.carries, partials: s.partials };
     case "areamodel": return { kind: "areamodel", cells: s.cells, total: s.total };
     case "longdiv": return { kind: "longdiv", q: s.q, prod: s.prod, rem: s.rem };

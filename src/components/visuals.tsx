@@ -2,6 +2,7 @@
 import { useState } from "react";
 import type { Visual } from "@/lib/engine/types";
 import { sv, tickLabel } from "@/lib/engine/gen-helpers";
+import { AngleV, CircleV, CoordPlane, CuboidV, PolygonV, SolidV } from "@/components/geo-visuals";
 
 const GOLD = "#e8b64a";
 const LINE = "#3a4c78";
@@ -317,6 +318,12 @@ export function VisualView({ v }: { v: Visual }) {
     case "area": return <AreaV a={v.a} b={v.b} />;
     case "grouping": return <Grouping value={v.value} />;
     case "compare": return <Compare a={v.a} b={v.b} />;
+    case "polygon": return <PolygonV {...v} />;
+    case "angle": return <AngleV deg={v.deg} protractor={v.protractor} base={v.base} label={v.label} />;
+    case "coordplane": return <CoordPlane {...v} />;
+    case "cuboid": return <CuboidV l={v.l} b={v.b} h={v.h} labels={v.labels} />;
+    case "solid": return <SolidV shape={v.shape} />;
+    case "circle": return <CircleV line={v.line} rLabel={v.rLabel} dLabel={v.dLabel} />;
   }
 }
 

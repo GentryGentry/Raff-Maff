@@ -1,5 +1,5 @@
 import type { Rng } from "./rng";
-import type { ConcreteExercise, Rubric } from "./types";
+import type { ConcreteExercise, P2, PlaneSpec, Rubric } from "./types";
 
 export const sv = (n: number | string): string => {
   // Swedish grouping with non-breaking space for integers, decimal comma
@@ -282,3 +282,32 @@ export const SQUARE_PATTERNS: Record<string, { a: number; b: number; heights: (n
   ell: { a: 2, b: -1, heights: (n) => [n, ...Array(Math.max(0, n - 1)).fill(1)] },
   towers: { a: 3, b: 1, heights: (n) => [...Array(n).fill(3), 1] },
 };
+
+// ---------- geometry ----------
+
+export function pointEx(id: string, skill: string, prompt: string, plane: PlaneSpec, x: number, y: number, explanation: string, hints: string[]): ConcreteExercise {
+  return { spec: { kind: "point", id, skill, prompt, plane }, solution: { kind: "point", x, y }, explanation, hints };
+}
+export const rectPts = (w: number, h: number): P2[] => [[0, 0], [w, 0], [w, h], [0, h]];
+/** Regular n-gon with a horizontal bottom side, circumradius r. */
+export function regularPts(n: number, r = 1): P2[] {
+  const out: P2[] = [];
+  const start = -Math.PI / 2 - Math.PI / n; // first vertex bottom-left of bottom side
+  for (let i = 0; i < n; i++) out.push([r * Math.cos(start + (2 * Math.PI * i) / n), r * Math.sin(start + (2 * Math.PI * i) / n)]);
+  return out;
+}
+/** Polygon area by the shoelace formula (independent of the generators' own formulas). */
+export function shoelace(pts: P2[]): number {
+  let s = 0;
+  for (let i = 0; i < pts.length; i++) { const [x1, y1] = pts[i], [x2, y2] = pts[(i + 1) % pts.length]; s += x1 * y2 - x2 * y1; }
+  return Math.abs(s) / 2;
+}
+export function perimeterPts(pts: P2[]): number {
+  let s = 0;
+  for (let i = 0; i < pts.length; i++) { const [x1, y1] = pts[i], [x2, y2] = pts[(i + 1) % pts.length]; s += Math.hypot(x2 - x1, y2 - y1); }
+  return s;
+}
+/** Rectilinear L-shape: outer w×h with a notch of nw×nh removed from the top-right corner. Counter-clockwise from the origin. */
+export function lShape(w: number, h: number, nw: number, nh: number): P2[] {
+  return [[0, 0], [w, 0], [w, h - nh], [w - nw, h - nh], [w - nw, h], [0, h]];
+}

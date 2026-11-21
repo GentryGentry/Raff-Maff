@@ -40,22 +40,22 @@ kravinnehåll.
 
 | Centralt innehåll | Var | Status |
 |---|---|---|
-| Två- och tredimensionella objekt, konstruktion | V10 | 🚧 |
-| Jämförelse, uppskattning, mätning av längd, area, massa, volym, tid och vinkel; enhetsbyten | V10, V11 | 🚧 |
-| Omkrets och area hos tvådimensionella figurer | V10 | 🚧 |
+| Två- och tredimensionella objekt, konstruktion | V10 L1 (månghörningar, trianglar, fyrhörningar), L9 (cirkel, kroppar) | ✅ (egenskaper) · konstruktion med passare/linjal 🚧 |
+| Jämförelse, uppskattning, mätning av längd, area, massa, volym, tid och vinkel; enhetsbyten | V10 L2–L6 (omkrets, area, volym, vinklar med gradskiva), V11 (massa, tid, enhetsbyten) | V10 ✅ · V11 🚧 |
+| Omkrets och area hos tvådimensionella figurer | V10 L2 (omkrets), L3 (area), L4 (parallellogram och trianglar) | ✅ |
 | Skala vid förminskning och förstoring | V11 | 🚧 |
-| Symmetri i planet | V10 | 🚧 |
+| Symmetri i planet | V10 L7 (symmetrilinjer, spegling i lodrät/vågrät linje) | ✅ (linjesymmetri) |
 | Slumpmässiga händelser, chans och risk; jämföra sannolikhet | V12 | 🚧 |
 | Enkel kombinatorik | V12 | 🚧 |
 | Tabeller och diagram; tolkning av data | V12 | 🚧 |
 | Lägesmått: medelvärde, typvärde, median | V12 | 🚧 |
 | Proportionalitet i bråk-, decimal- och procentform | V7 L5 (dubbel tallinje, proportionalitet i procentform), V7 L3–L4, L7; bråk som del av antal i V5 L7 | ✅ (procent) · grafer 🚧 |
-| Koordinatsystem och gradering av koordinataxlar | **Saknar egen värld** – föreslås i V10 (geometri) | 🚧 |
-| Grafer för proportionella samband | **Saknar egen värld** – föreslås i V12 | 🚧 |
+| Koordinatsystem och gradering av koordinataxlar | V10 L8 (första kvadranten, punkter, avstånd, rektanglar, regler och tabeller) | ✅ (första kvadranten) |
+| Grafer för proportionella samband | V10 L8 (regel → tabell → punkter på en linje, enkelt); egentliga grafer av proportionella samband föreslås i V12 | ✅ delvis |
 | Strategier för att lösa matematiska problem; formulera frågeställningar | V2 L7, V13 | V2 L7 ✅ |
 
 ## Luckor att besluta om
 
 1. **Programmering i visuella miljöer** står i centralt innehåll för åk 4–6 men finns inte bland de 13 världarna. Algoritmer som tankesätt täcks nu av V9 L8, men appen har ingen programmeringsmiljö.
-2. **Samband och förändring** (proportionalitet, koordinatsystem, grafer) är ett eget område i Lgr22 men har ingen värld; placeringen ovan är ett förslag.
+2. **Samband och förändring** (proportionalitet, koordinatsystem, grafer) är ett eget område i Lgr22 men har ingen värld; koordinatsystemet och enkla regel/tabell/punkt-uppgifter ligger nu i V10 L8, grafer av proportionella samband är ett förslag för V12.
 3. Fördelningen på åk 4, 5 och 6 görs *inte* i centralt innehåll (det gäller åk 4–6 som helhet). Lektionerna är därför märkta "åk 4–6" och ordnade efter kunskapsprogression, inte efter årskurs.

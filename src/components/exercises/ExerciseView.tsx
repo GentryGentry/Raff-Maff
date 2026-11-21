@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Rich } from "@/components/Rich";
 import { FractionBarV, VisualView } from "@/components/visuals";
+import { CoordPlane } from "@/components/geo-visuals";
 import { sv, tickLabel } from "@/lib/engine/gen-helpers";
 import type { Answer, ExerciseSpec } from "@/lib/engine/types";
 
@@ -19,6 +20,7 @@ export function emptyAnswer(spec: ExerciseSpec): Answer {
     case "areamodel": return { kind: "areamodel", cells: [], total: "" };
     case "longdiv": return { kind: "longdiv", q: [], prod: [], rem: [] };
     case "gridshade": return { kind: "gridshade", value: 0 };
+    case "point": return { kind: "point", x: null, y: null };
     case "expr": return { kind: "expr", value: "" };
     case "multifield": return { kind: "multifield", values: spec.fields.map(() => "") };
     case "text": return { kind: "text", value: "" };
@@ -33,6 +35,7 @@ export function isAnswered(spec: ExerciseSpec, a: Answer | undefined): boolean {
     case "column": return a.result.trim() !== "";
     case "fractionbar": case "gridshade": return a.value > 0;
     case "expr": return a.value.trim() !== "";
+    case "point": return a.x !== null && a.y !== null;
     case "areamodel": return a.total.trim() !== "";
     case "longdiv": return a.q.some((x) => (x ?? "").trim() !== "");
     case "multifield": return a.values.some((v) => v.trim() !== "");
@@ -217,6 +220,17 @@ function ExprInput({ spec, value, onChange, disabled }: ExProps & { spec: Extrac
   );
 }
 
+/* ───────── tap a point in a coordinate system ───────── */
+function PointInput({ spec, value, onChange, disabled }: ExProps & { spec: Extract<ExerciseSpec, { kind: "point" }> }) {
+  const p = value?.kind === "point" && value.x !== null && value.y !== null ? { x: value.x, y: value.y } : null;
+  return (
+    <div className="space-y-2">
+      <CoordPlane {...spec.plane} picked={p} disabled={disabled} onPick={(x, y) => onChange({ kind: "point", x, y })} />
+      <p className="text-center text-sm text-[#8d99b3]">{p ? <>Du har valt: <strong className="text-[#f3d58a]">({p.x}, {p.y})</strong></> : "Tryck på den punkt där linjerna möts."}</p>
+    </div>
+  );
+}
+
 /* ───────── 10x10 grid shading ───────── */
 function GridShadeInput({ value, onChange, disabled }: ExProps) {
   const n = value?.kind === "gridshade" ? value.value : 0;
@@ -309,6 +323,7 @@ export function ExerciseView({ spec, value, onChange, disabled }: ExProps) {
       {spec.kind === "areamodel" && <AreaInput {...props} spec={spec} />}
       {spec.kind === "longdiv" && <LongDivInput {...props} spec={spec} />}
       {spec.kind === "gridshade" && <GridShadeInput {...props} />}
+      {spec.kind === "point" && <PointInput {...props} spec={spec} />}
       {spec.kind === "expr" && <ExprInput {...props} spec={spec} />}
       {spec.kind === "fractionbar" && (
         <div className="space-y-2">
