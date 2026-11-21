@@ -203,3 +203,71 @@ describe("percent exercises agree with their own prompts (independent exact arit
     });
   }
 });
+
+// ── Independent check of negative-number exercises (signs are easy to get wrong) ──
+describe("negative-number exercises agree with their own prompts (independent arithmetic)", () => {
+  const N = (s: string) => Number(s.replace(/[\s ]/g, "").replace(/−/g, "-").replace(",", "."));
+  const SIGNED = "(\\u2212?\\d+)";
+  const gen = (lessonId: string, tplId: string, seed: number) => {
+    const lesson = getLesson(lessonId)!;
+    const t = [...lesson.knowledge, ...lesson.method, ...lesson.representation].find((x) => x.id === tplId)!;
+    return t.gen(makeRng(`neg${seed}`), { level: 1 });
+  };
+  const ans = (ex: ConcreteExercise) => (ex.solution.kind === "numeric" ? N(ex.solution.accept[0]) : NaN);
+  const cases: { l: string; t: string; re: RegExp; calc: (m: RegExpMatchArray) => number }[] = [
+    { l: "w8-l4", t: "addPos", re: new RegExp(`^${SIGNED} \\+ (\\d+) = \\?$`), calc: (m) => N(m[1]) + N(m[2]) },
+    { l: "w8-l4", t: "subPos", re: new RegExp(`^${SIGNED} \\u2212 (\\d+) = \\?$`), calc: (m) => N(m[1]) - N(m[2]) },
+    { l: "w8-l4", t: "addNeg", re: new RegExp(`^${SIGNED} \\+ \\(${SIGNED}\\) = \\?$`), calc: (m) => N(m[1]) + N(m[2]) },
+    { l: "w8-l4", t: "hop", re: new RegExp(`^Starta vid ${SIGNED} och hoppa (\\d+) steg åt (höger|vänster)\\. Var hamnar du\\?$`), calc: (m) => N(m[1]) + (m[3] === "höger" ? 1 : -1) * N(m[2]) },
+    { l: "w8-l5", t: "diff", re: new RegExp(`^Vilken är skillnaden mellan ${SIGNED} och ${SIGNED}\\?$`), calc: (m) => Math.abs(N(m[1]) - N(m[2])) },
+    { l: "w8-l5", t: "subNeg", re: new RegExp(`^\\(Fördjupning\\) ${SIGNED} \\u2212 \\(${SIGNED}\\) = \\?$`), calc: (m) => N(m[1]) - N(m[2]) },
+    { l: "w8-l5", t: "distanceSteps", re: new RegExp(`^Hur många steg är det från ${SIGNED} till (\\d+) på tallinjen\\?$`), calc: (m) => N(m[2]) - N(m[1]) },
+    { l: "w8-l3", t: "midpoint", re: new RegExp(`^Vilket tal ligger mitt emellan ${SIGNED} och ${SIGNED}\\?$`), calc: (m) => (N(m[1]) + N(m[2])) / 2 },
+    { l: "w8-l3", t: "smallestGreater", re: new RegExp(`^Vilket är det minsta heltalet som är större än ${SIGNED}\\?$`), calc: (m) => N(m[1]) + 1 },
+    { l: "w8-l1", t: "oneLess", re: new RegExp(`^Vilket tal är 1 (mindre|mer) än ${SIGNED}\\?$`), calc: (m) => N(m[2]) + (m[1] === "mindre" ? -1 : 1) },
+    { l: "w8-l2", t: "opposite", re: new RegExp(`^Vilket är det motsatta talet till ${SIGNED}\\?$`), calc: (m) => -N(m[1]) },
+    { l: "w8-l2", t: "distance", re: new RegExp(`^Hur många steg från noll ligger ${SIGNED}\\?$`), calc: (m) => Math.abs(N(m[1])) },
+    { l: "w8-l6", t: "bank", re: new RegExp(`^Kontot visar ${SIGNED} kr\\. Du (sätter in|tar ut) (\\d+) kr\\. Vad visar kontot nu\\?$`), calc: (m) => N(m[1]) + (m[2] === "sätter in" ? 1 : -1) * N(m[3]) },
+    { l: "w8-l6", t: "elevator", re: new RegExp(`^Hissen står på våning ${SIGNED} och åker (\\d+) våningar (upp|ner)\\. Vilken våning står den på nu\\?$`), calc: (m) => N(m[1]) + (m[3] === "upp" ? 1 : -1) * N(m[2]) },
+    { l: "w8-l6", t: "submarine", re: new RegExp(`^En ubåt ligger på ${SIGNED} m och stiger (\\d+) m\\. Var ligger den nu \\(i meter\\)\\?$`), calc: (m) => N(m[1]) + N(m[2]) },
+    { l: "w8-l6", t: "spread", re: /^Temperaturerna under fyra nätter var (.+) °C\. Vilken är skillnaden mellan högsta och lägsta\?$/, calc: (m) => { const v = m[1].split(",").map((x) => N(x)); return Math.max(...v) - Math.min(...v); } },
+  ];
+  for (const c of cases) {
+    it(`${c.l} ${c.t}: prompt → independent answer`, () => {
+      let checked = 0;
+      for (let seed = 0; seed < 300; seed++) {
+        const ex = gen(c.l, c.t, seed);
+        const m = ex.spec.prompt.match(c.re);
+        if (!m) throw new Error(`prompt did not match: "${ex.spec.prompt}"`);
+        expect(ans(ex), `"${ex.spec.prompt}"`).toBeCloseTo(c.calc(m), 9);
+        checked++;
+      }
+      expect(checked).toBe(300);
+    });
+  }
+  it("the typed minus sign variants are all accepted", () => {
+    const ex = gen("w8-l4", "addPos", 1);
+    const right = ex.solution.kind === "numeric" ? ex.solution.accept[0] : "";
+    for (const v of [right, right.replace("-", "−"), right.replace("-", "–")]) expect(gradeExercise(ex, { kind: "numeric", value: v }).correct, v).toBe(true);
+  });
+});
+
+describe("answer normalisation accepts how people actually type", () => {
+  const ex = (accept: string) => ({ spec: { kind: "numeric", id: "x", skill: "s", prompt: "" }, solution: { kind: "numeric", accept: [accept] }, explanation: "", hints: [] }) as ConcreteExercise;
+  const ok = (e: ConcreteExercise, typed: string) => gradeExercise(e, { kind: "numeric", value: typed }).correct;
+  it("percent signs, spaces and decimal comma/point", () => {
+    for (const t of ["35", "35 %", "35%", " 35 % ", "35 %", "+35"]) expect(ok(ex("35"), t), t).toBe(true);
+    for (const t of ["2,4", "2.4", "2,40", "2,4 %"]) expect(ok(ex("2.4"), t), t).toBe(true);
+    for (const t of ["1 000", "1000", "1 000"]) expect(ok(ex("1000"), t), t).toBe(true);
+  });
+  it("minus sign, en dash, em dash and hyphen all mean negative", () => {
+    for (const t of ["-3", "−3", "–3", "—3", "- 3", "− 3"]) expect(ok(ex("-3"), t), t).toBe(true);
+  });
+  it("still rejects wrong answers (sign and size)", () => {
+    expect(ok(ex("-3"), "3")).toBe(false);
+    expect(ok(ex("3"), "-3")).toBe(false);
+    expect(ok(ex("35"), "36 %")).toBe(false);
+    expect(ok(ex("0.35"), "35")).toBe(false);
+    expect(ok(ex("35"), "0,35")).toBe(false);
+  });
+});

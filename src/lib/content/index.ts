@@ -6,9 +6,9 @@ import { world4 } from "./w4";
 import { world5 } from "./w5";
 import { world6 } from "./w6";
 import { world7 } from "./w7";
+import { world8 } from "./w8";
 
 const PLANNED: Omit<World, "lessons">[] = [
-  { id: "w8", index: 8, title: "Negativa tal", icon: "⑧", tagline: "Tallinjen åt vänster om noll.", lgr: "Taluppfattning: negativa tal" },
   { id: "w9", index: 9, title: "Algebra och mönster", icon: "⑨", tagline: "Talföljder, uttryck, ekvationer och likhet.", lgr: "Algebra" },
   { id: "w10", index: 10, title: "Geometri", icon: "⑩", tagline: "Figurer, omkrets, area, volym och symmetri.", lgr: "Geometri" },
   { id: "w11", index: 11, title: "Enheter och mätning", icon: "⑪", tagline: "Längd, massa, volym, tid och skala.", lgr: "Geometri: mätning och enheter" },
@@ -39,6 +39,7 @@ export const WORLDS: World[] = [
   world5,
   world6,
   world7,
+  world8,
   ...PLANNED.map((w) => ({ ...w, lessons: [] as Lesson[], planned: PLANNED_LESSONS[w.id] })),
 ];
 

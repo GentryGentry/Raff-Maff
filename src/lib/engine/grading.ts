@@ -2,8 +2,9 @@ import type { Answer, ConcreteExercise, ItemResult, Rubric, Solution } from "./t
 
 export function normNum(s: string): string {
   return s
-    .replace(/−/g, "-")
-    .replace(/[\s  ]/g, "")
+    .replace(/[\u2212\u2013\u2014]/g, "-") // minus sign, en dash, em dash -> hyphen-minus
+    .replace(/[\s\u00a0\u202f]/g, "") // spaces, nbsp, narrow nbsp
+    .replace(/%/g, "") // "35 %" == "35"
     .replace(",", ".")
     .replace(/^\+/, "");
 }

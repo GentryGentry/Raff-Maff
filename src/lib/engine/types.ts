@@ -19,6 +19,7 @@ export type Visual =
   | { type: "fractionset"; total: number; groups: number; shadedGroups: number }
   | { type: "decimalplace"; value: string }
   | { type: "decimalgrid"; hundredths: number }
+  | { type: "thermometer"; value: number; min?: number; max?: number }
   | { type: "percentbar"; pct: number; label?: string }
   | { type: "doublenumberline"; total: number; unit?: string; hideTotal?: boolean; marks: { pct: number; showAmount?: boolean }[] }
   | { type: "area"; a: number; b: number }

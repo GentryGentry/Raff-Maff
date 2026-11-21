@@ -192,6 +192,30 @@ function DoubleLineV({ total, unit = "", marks, hideTotal }: { total: number; un
   );
 }
 
+function ThermometerV({ value, min = -20, max = 30 }: { value: number; min?: number; max?: number }) {
+  const top = 14, H = 190, x = 58;
+  const y = (v: number) => top + ((max - v) / (max - min)) * H;
+  const bottom = y(min);
+  const warm = value > 0, cold = value < 0;
+  const col = warm ? "#ef6a6a" : cold ? "#60a5fa" : "#c3cce0";
+  const ticks: number[] = [];
+  for (let v = Math.ceil(min / 5) * 5; v <= max; v += 5) ticks.push(v);
+  return (
+    <svg viewBox="0 0 170 236" className="h-56" role="img" aria-label={`Termometer som visar ${value} grader`}>
+      <rect x={x - 7} y={top - 6} width={14} height={bottom - top + 12} rx={7} fill="#0b1428" stroke="#fff" strokeOpacity={0.6} />
+      <rect x={x - 3.5} y={y(Math.max(min, value))} width={7} height={bottom - y(Math.max(min, value)) + 4} fill={col} />
+      <circle cx={x} cy={bottom + 8} r={11} fill={col} stroke="#fff" strokeOpacity={0.6} />
+      {ticks.map((v) => (
+        <g key={v}>
+          <line x1={x + 9} x2={x + (v % 10 === 0 ? 20 : 15)} y1={y(v)} y2={y(v)} stroke={v === 0 ? GOLD : "#fff"} strokeWidth={v === 0 ? 2 : 1} />
+          {v % 10 === 0 && <text x={x + 24} y={y(v) + 4} fill={v === 0 ? GOLD : "#8d99b3"} fontSize={11} fontWeight={v === 0 ? 700 : 400}>{sv(v)}°</text>}
+        </g>
+      ))}
+      <line x1={x - 22} x2={x - 9} y1={y(value)} y2={y(value)} stroke={col} strokeWidth={3} />
+    </svg>
+  );
+}
+
 function AreaV({ a, b }: { a: number; b: number }) {
   const c = Math.min(26, 280 / Math.max(a, 1), 160 / Math.max(b, 1));
   return (
@@ -238,6 +262,7 @@ export function VisualView({ v }: { v: Visual }) {
     case "fractionbars": return <FractionBarsV bars={v.bars} />;
     case "decimalplace": return <DecimalPlaceV value={v.value} />;
     case "decimalgrid": return <DecimalGridV hundredths={v.hundredths} />;
+    case "thermometer": return <ThermometerV value={v.value} min={v.min} max={v.max} />;
     case "percentbar": return <PercentBarV pct={v.pct} label={v.label} />;
     case "doublenumberline": return <DoubleLineV total={v.total} unit={v.unit} hideTotal={v.hideTotal} marks={v.marks} />;
     case "fractioncircle": return <FractionCircleV parts={v.parts} shaded={v.shaded} />;
