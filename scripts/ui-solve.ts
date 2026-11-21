@@ -40,6 +40,7 @@ const LABEL: Record<string, string> = { knowledge: "Kunskapsprov", method: "Skri
           case "multifield": for (let k = 0; k < s.values.length; k++) await page.locator("label input.field").nth(k).fill(s.values[k][0]); break;
           case "numberline": for (let k = 0; k < Math.round((s.value - spec.min) / spec.step); k++) await page.getByRole("button", { name: "Flytta ett steg åt höger" }).click(); break;
           case "fractionbar": await page.locator('svg[aria-label^="Bråkstapel"] rect').nth(s.value - 1).click(); break;
+          case "gridshade": await page.locator('svg[aria-label^="Hundrarutnät – tryck"] rect').nth(s.value - 1).click(); break;
           case "areamodel": for (let k = 0; k < s.cells.length; k++) await page.locator('input[aria-label*=" gånger "]').nth(k).fill(s.cells[k]); await page.locator("label:has-text('Summa') input").fill(s.total); break;
           case "column":
             for (let c = 0; c < s.carries.length; c++) if (s.carries[c]) await page.getByLabel(new RegExp(`(minnessiffra|växling) kolumn ${c + 1}$`)).fill(s.carries[c]);

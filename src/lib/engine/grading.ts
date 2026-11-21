@@ -42,6 +42,7 @@ function expectedAnswerText(sol: Solution, spec: ConcreteExercise["spec"]): stri
       return sol.result;
     case "numberline":
     case "fractionbar":
+    case "gridshade":
       return String(sol.value);
     case "areamodel":
       return `${sol.cells.join(", ")} → ${sol.total}`;
@@ -74,7 +75,8 @@ export function gradeExercise(ex: ConcreteExercise, ans: Answer | undefined): It
       return ok ? { ...base, points: 1, max: 1, correct: true, feedback: "Rätt!" } : wrong("Inte riktigt.");
     }
     case "numberline":
-    case "fractionbar": {
+    case "fractionbar":
+    case "gridshade": {
       const a = ans as { value: number | null };
       const ok = a.value != null && Math.abs(a.value - sol.value) < 1e-9;
       return ok ? { ...base, points: 1, max: 1, correct: true, feedback: "Rätt!" } : wrong("Inte riktigt.");
@@ -174,6 +176,7 @@ export function perfectAnswer(ex: ConcreteExercise): Answer {
     case "numeric": return { kind: "numeric", value: s.accept[0] };
     case "numberline": return { kind: "numberline", value: s.value };
     case "fractionbar": return { kind: "fractionbar", value: s.value };
+    case "gridshade": return { kind: "gridshade", value: s.value };
     case "column": return { kind: "column", result: s.result, carries: s.carries, partials: s.partials };
     case "areamodel": return { kind: "areamodel", cells: s.cells, total: s.total };
     case "longdiv": return { kind: "longdiv", q: s.q, prod: s.prod, rem: s.rem };

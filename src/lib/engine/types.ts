@@ -12,13 +12,15 @@ export const SECTION_LABEL: Record<Section, string> = {
 export type Visual =
   | { type: "placevalue"; value: number }
   | { type: "baseten"; value: number }
-  | { type: "numberline"; min: number; max: number; step: number; marks?: number[]; labelEvery?: number; den?: number; dp?: number }
+  | { type: "numberline"; min: number; max: number; step: number; marks?: number[]; labelEvery?: number; den?: number; dp?: number; unit?: string }
   | { type: "fractionbar"; parts: number; shaded: number }
   | { type: "fractionbars"; bars: { parts: number; shaded: number; label?: string }[] }
   | { type: "fractioncircle"; parts: number; shaded: number }
   | { type: "fractionset"; total: number; groups: number; shadedGroups: number }
   | { type: "decimalplace"; value: string }
   | { type: "decimalgrid"; hundredths: number }
+  | { type: "percentbar"; pct: number; label?: string }
+  | { type: "doublenumberline"; total: number; unit?: string; hideTotal?: boolean; marks: { pct: number; showAmount?: boolean }[] }
   | { type: "area"; a: number; b: number }
   | { type: "grouping"; value: number }
   | { type: "compare"; a: number; b: number };
@@ -30,10 +32,11 @@ export type ExerciseSpec =
   | { kind: "mc"; id: string; skill: string; prompt: string; options: string[]; visual?: Visual }
   | { kind: "numeric"; id: string; skill: string; prompt: string; unit?: string; visual?: Visual }
   | { kind: "column"; id: string; skill: string; prompt: string; op: ColumnOp; a: number; b: number; dp?: number }
-  | { kind: "numberline"; id: string; skill: string; prompt: string; min: number; max: number; step: number; labelEvery: number; format?: "int" | "dec1" | "frac"; den?: number; dp?: number }
+  | { kind: "numberline"; id: string; skill: string; prompt: string; min: number; max: number; step: number; labelEvery: number; format?: "int" | "dec1" | "frac"; den?: number; dp?: number; unit?: string }
   | { kind: "fractionbar"; id: string; skill: string; prompt: string; parts: number }
   | { kind: "areamodel"; id: string; skill: string; prompt: string; a: number; b: number; aParts: number[]; bParts: number[] }
   | { kind: "longdiv"; id: string; skill: string; prompt: string; a: number; b: number; p0: number }
+  | { kind: "gridshade"; id: string; skill: string; prompt: string }
   | { kind: "multifield"; id: string; skill: string; prompt: string; fields: { label: string; suffix?: string }[]; visual?: Visual }
   | { kind: "text"; id: string; skill: string; prompt: string; scenario?: string; minChars: number };
 
@@ -45,6 +48,7 @@ export type Answer =
   | { kind: "fractionbar"; value: number }
   | { kind: "areamodel"; cells: string[]; total: string }
   | { kind: "longdiv"; q: string[]; prod: string[]; rem: string[] }
+  | { kind: "gridshade"; value: number }
   | { kind: "multifield"; values: string[] }
   | { kind: "text"; value: string };
 
@@ -57,6 +61,7 @@ export type Solution =
   | { kind: "fractionbar"; value: number }
   | { kind: "areamodel"; cells: string[]; total: string }
   | { kind: "longdiv"; q: string[]; prod: string[]; rem: string[]; quotient: number; remainder: number }
+  | { kind: "gridshade"; value: number }
   | { kind: "multifield"; values: string[][] } // each field: list of accepted values
   | { kind: "text"; rubric: Rubric; modelAnswer: string };
 

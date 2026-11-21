@@ -153,7 +153,7 @@ export function areaEx(
 
 export function numberlineEx(
   id: string, skill: string, prompt: string, value: number,
-  line: { min: number; max: number; step: number; labelEvery: number; format?: "int" | "dec1"; den?: number; dp?: number },
+  line: { min: number; max: number; step: number; labelEvery: number; format?: "int" | "dec1"; den?: number; dp?: number; unit?: string },
   explanation: string, hints: string[],
 ): ConcreteExercise {
   return {
@@ -241,8 +241,24 @@ export function dcTrim(n: number, dp: number): string {
 /** Accepted typed answers (canonical number compare ignores comma/dot and trailing zeros). */
 export const dcAcc = (n: number, dp: number): string[] => [dcTrim(n, dp).replace(",", ".")];
 /** Tick label on a number line whose ticks are integers: fractions (den), decimals (dp) or plain. */
-export function tickLabel(v: number, den?: number, dp?: number): string {
-  if (den) return fracLabel(v, den);
-  if (dp) return dcTrim(v, dp);
-  return sv(v);
+export function tickLabel(v: number, den?: number, dp?: number, unit?: string): string {
+  const base = den ? fracLabel(v, den) : dp ? dcTrim(v, dp) : sv(v);
+  return unit ? `${base}\u00a0${unit}` : base;
+}
+
+// ---------- percent ----------
+/** p % of N, asserting the result is a whole number (generators must choose N so it is). */
+export function pctOf(p: number, N: number): number {
+  if ((p * N) % 100 !== 0) throw new Error(`${p}% of ${N} is not whole`);
+  return (p * N) / 100;
+}
+/** A base N for which p % of N is a whole number, scaled by `mult` (step = 100/gcd(p,100)). */
+export function baseFor(p: number, mult: number): number {
+  return (100 / gcd(p, 100)) * mult;
+}
+/** Percent text with Swedish spacing: "35 %". */
+export const pc = (p: number | string) => `${p}\u00a0%`;
+
+export function gridshadeEx(id: string, skill: string, prompt: string, value: number, explanation: string, hints: string[]): ConcreteExercise {
+  return { spec: { kind: "gridshade", id, skill, prompt }, solution: { kind: "gridshade", value }, explanation, hints };
 }

@@ -159,3 +159,47 @@ describe("long division (liggande stolen)", () => {
     expect(wrongQ.points).toBe(1);
   });
 });
+
+// ── Independent check of percent exercises: re-derive each answer from the PROMPT TEXT with exact rational arithmetic ──
+import { getLesson } from "@/lib/content";
+describe("percent exercises agree with their own prompts (independent exact arithmetic)", () => {
+  const num = (s: string) => Number(s.replace(/[\s ]/g, "").replace(",", "."));
+  const gen = (lessonId: string, tplId: string, seed: number, level = 1) => {
+    const lesson = getLesson(lessonId)!;
+    const t = [...lesson.knowledge, ...lesson.method, ...lesson.representation].find((x) => x.id === tplId)!;
+    return t.gen(makeRng(`ind${seed}`), { level });
+  };
+  const answerOf = (ex: ConcreteExercise) => (ex.solution.kind === "numeric" ? Number(ex.solution.accept[0].replace(",", ".")) : NaN);
+  const cases: { lesson: string; tpl: string; re: RegExp; calc: (m: RegExpMatchArray) => number }[] = [
+    { lesson: "w7-l4", tpl: "pctOfN", re: /^([\d,]+) % av ([\d\s ]+) = \?$/, calc: (m) => (num(m[1]) * num(m[2])) / 100 },
+    { lesson: "w7-l4", tpl: "over100", re: /^([\d]+) % av ([\d]+) = \?$/, calc: (m) => (num(m[1]) * num(m[2])) / 100 },
+    { lesson: "w7-l3", tpl: "tenPct", re: /^10 % av ([\d\s ]+) = \?$/, calc: (m) => num(m[1]) / 10 },
+    { lesson: "w7-l3", tpl: "half", re: /^50 % av ([\d\s ]+) = \?$/, calc: (m) => num(m[1]) / 2 },
+    { lesson: "w7-l3", tpl: "five", re: /^5 % av ([\d\s ]+) = \?$/, calc: (m) => (5 * num(m[1])) / 100 },
+    { lesson: "w7-l3", tpl: "one", re: /^1 % av ([\d\s ]+) = \?$/, calc: (m) => num(m[1]) / 100 },
+    { lesson: "w7-l6", tpl: "pctOfWhole", re: /^Hur många procent är ([\d\s ]+) av ([\d\s ]+)\?$/, calc: (m) => (num(m[1]) * 100) / num(m[2]) },
+    { lesson: "w7-l7", tpl: "wholeHard", re: /^([\d]+) % av ett tal är ([\d\s ]+)\. Vilket är talet\?$/, calc: (m) => (num(m[2]) * 100) / num(m[1]) },
+    { lesson: "w7-l7", tpl: "wholeSimple", re: /^([\d]+) % av ett tal är ([\d\s ]+)\. Vilket är talet\?$/, calc: (m) => (num(m[2]) * 100) / num(m[1]) },
+    { lesson: "w7-l8", tpl: "newPrice", re: /^En vara kostar ([\d\s ]+) kr och sänks med ([\d]+) %\. Vad kostar den nu\?$/, calc: (m) => num(m[1]) - (num(m[2]) * num(m[1])) / 100 },
+    { lesson: "w7-l8", tpl: "increase", re: /^Ett pris på ([\d\s ]+) kr höjs med ([\d]+) %\. Vad är det nya priset\?$/, calc: (m) => num(m[1]) + (num(m[2]) * num(m[1])) / 100 },
+    { lesson: "w7-l10", tpl: "interest", re: /^Räntan är ([\d]+) % per år på ([\d\s ]+) kr\. Hur stor är räntan efter ett år\?$/, calc: (m) => (num(m[1]) * num(m[2])) / 100 },
+    { lesson: "w7-l10", tpl: "vat", re: /^En vara kostar ([\d]+) kr utan moms\. Moms är 25 %\. Vad kostar den med moms\?$/, calc: (m) => num(m[1]) * 1.25 },
+    { lesson: "w7-l5", tpl: "wholeFrom", re: /^([\d]+) % av ett tal är ([\d]+)\. Vilket är talet\?$/, calc: (m) => (num(m[2]) * 100) / num(m[1]) },
+    { lesson: "w6-l8", tpl: "mulInt", re: /^([\d,]+) · ([\d]+) = \?$/, calc: (m) => Math.round(num(m[1]) * num(m[2]) * 1000) / 1000 },
+    { lesson: "w6-l6", tpl: "roundTenth", re: /^Avrunda ([\d,]+) till närmaste tiondel\.$/, calc: (m) => Math.floor(num(m[1]) * 10 + 0.5 + 1e-9) / 10 },
+  ];
+  for (const c of cases) {
+    it(`${c.lesson} ${c.tpl}: prompt → independent answer`, () => {
+      let checked = 0;
+      for (let seed = 0; seed < 250; seed++) for (const level of [1, 2]) {
+        const ex = gen(c.lesson, c.tpl, seed, level);
+        const m = ex.spec.prompt.match(c.re);
+        if (!m) throw new Error(`prompt did not match expected format: "${ex.spec.prompt}"`);
+        const want = c.calc(m);
+        expect(Math.abs(answerOf(ex) - want), `"${ex.spec.prompt}" expected ${want} got ${answerOf(ex)}`).toBeLessThan(1e-6);
+        checked++;
+      }
+      expect(checked).toBeGreaterThan(100);
+    });
+  }
+});

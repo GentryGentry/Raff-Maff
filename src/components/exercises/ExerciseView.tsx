@@ -18,6 +18,7 @@ export function emptyAnswer(spec: ExerciseSpec): Answer {
     case "fractionbar": return { kind: "fractionbar", value: 0 };
     case "areamodel": return { kind: "areamodel", cells: [], total: "" };
     case "longdiv": return { kind: "longdiv", q: [], prod: [], rem: [] };
+    case "gridshade": return { kind: "gridshade", value: 0 };
     case "multifield": return { kind: "multifield", values: spec.fields.map(() => "") };
     case "text": return { kind: "text", value: "" };
   }
@@ -29,7 +30,7 @@ export function isAnswered(spec: ExerciseSpec, a: Answer | undefined): boolean {
     case "mc": case "numberline": return a.value !== null;
     case "numeric": return a.value.trim() !== "";
     case "column": return a.result.trim() !== "";
-    case "fractionbar": return a.value > 0;
+    case "fractionbar": case "gridshade": return a.value > 0;
     case "areamodel": return a.total.trim() !== "";
     case "longdiv": return a.q.some((x) => (x ?? "").trim() !== "");
     case "multifield": return a.values.some((v) => v.trim() !== "");
@@ -133,7 +134,7 @@ function ColumnInput({ spec, value, onChange, disabled }: ExProps & { spec: Extr
 function NumberLineInput({ spec, value, onChange, disabled }: ExProps & { spec: Extract<ExerciseSpec, { kind: "numberline" }> }) {
   const sel = value?.kind === "numberline" ? value.value : null;
   const n = Math.round((spec.max - spec.min) / spec.step);
-  const fmt = (v: number) => tickLabel(v, spec.den, spec.dp);
+  const fmt = (v: number) => tickLabel(v, spec.den, spec.dp, spec.unit);
   const x = (v: number) => 16 + ((v - spec.min) / (spec.max - spec.min)) * 288;
   const pick = (clientX: number, el: SVGSVGElement) => {
     if (disabled) return;
@@ -192,6 +193,27 @@ function LongDivInput({ spec, value, onChange, disabled }: ExProps & { spec: Ext
         </div>
       ))}
       <div className="text-center text-sm text-[#c3cce0]">Kvot: <strong className="text-lg text-[#f3d58a]">{a.q.slice(0, steps).map((x) => x || "_").join("")}</strong>{(a.rem[steps - 1] ?? "") !== "" && a.rem[steps - 1] !== "0" ? <> rest <strong>{a.rem[steps - 1]}</strong></> : null}</div>
+    </div>
+  );
+}
+
+/* ───────── 10x10 grid shading ───────── */
+function GridShadeInput({ value, onChange, disabled }: ExProps) {
+  const n = value?.kind === "gridshade" ? value.value : 0;
+  const c = 20;
+  return (
+    <div className="space-y-2">
+      <svg viewBox="0 0 208 208" className="mx-auto w-60 touch-manipulation select-none" role="img" aria-label="Hundrarutnät – tryck för att färglägga">
+        {Array.from({ length: 100 }, (_, i) => (
+          <rect key={i} x={4 + (i % 10) * c} y={4 + Math.floor(i / 10) * c} width={c - 1.5} height={c - 1.5} rx={2} fill={i < n ? "#e8b64a" : "#0b1428"} fillOpacity={i < n ? 0.9 : 1} stroke="#3a4c78" strokeWidth={0.6}
+            onClick={() => { if (!disabled) onChange({ kind: "gridshade", value: n === i + 1 ? i : i + 1 }); }} style={{ cursor: disabled ? undefined : "pointer" }} />
+        ))}
+      </svg>
+      <div className="flex items-center justify-center gap-3">
+        <button type="button" className="btn btn-ghost" disabled={disabled} onClick={() => onChange({ kind: "gridshade", value: Math.max(0, n - 1) })} aria-label="En ruta mindre">−</button>
+        <span className="min-w-28 text-center text-sm text-[#8d99b3]">{n} av 100 rutor</span>
+        <button type="button" className="btn btn-ghost" disabled={disabled} onClick={() => onChange({ kind: "gridshade", value: Math.min(100, n + 1) })} aria-label="En ruta till">+</button>
+      </div>
     </div>
   );
 }
@@ -266,6 +288,7 @@ export function ExerciseView({ spec, value, onChange, disabled }: ExProps) {
       {spec.kind === "numberline" && <NumberLineInput {...props} spec={spec} />}
       {spec.kind === "areamodel" && <AreaInput {...props} spec={spec} />}
       {spec.kind === "longdiv" && <LongDivInput {...props} spec={spec} />}
+      {spec.kind === "gridshade" && <GridShadeInput {...props} />}
       {spec.kind === "fractionbar" && (
         <div className="space-y-2">
           <FractionBarV parts={spec.parts} shaded={value?.kind === "fractionbar" ? value.value : 0} onToggle={disabled ? undefined : (i) => onChange({ kind: "fractionbar", value: value?.kind === "fractionbar" && value.value === i + 1 ? i : i + 1 })} />

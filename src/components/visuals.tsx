@@ -52,8 +52,8 @@ function BaseTen({ value }: { value: number }) {
   );
 }
 
-function NumberLineV({ min, max, step, marks = [], labelEvery, den, dp }: { min: number; max: number; step: number; marks?: number[]; labelEvery?: number; den?: number; dp?: number }) {
-  const fmt = (v: number) => tickLabel(v, den, dp);
+function NumberLineV({ min, max, step, marks = [], labelEvery, den, dp, unit }: { min: number; max: number; step: number; marks?: number[]; labelEvery?: number; den?: number; dp?: number; unit?: string }) {
+  const fmt = (v: number) => tickLabel(v, den, dp, unit);
   const n = Math.round((max - min) / step);
   const x = (v: number) => 16 + ((v - min) / (max - min)) * 288;
   const le = labelEvery ?? (max - min);
@@ -154,6 +154,44 @@ function DecimalGridV({ hundredths }: { hundredths: number }) {
   );
 }
 
+function PercentBarV({ pct, label }: { pct: number; label?: string }) {
+  const W = 280, x0 = 30;
+  return (
+    <svg viewBox="0 0 340 78" className="w-full max-w-md" role="img" aria-label={`Procentstapel: ${pct} procent färgat`}>
+      <rect x={x0} y={14} width={W} height={30} rx={4} fill="#0b1428" stroke="#fff" strokeOpacity={0.6} />
+      <rect x={x0} y={14} width={(W * Math.min(100, pct)) / 100} height={30} rx={4} fill={GOLD} fillOpacity={0.9} />
+      {Array.from({ length: 9 }, (_, i) => <line key={i} x1={x0 + ((i + 1) * W) / 10} x2={x0 + ((i + 1) * W) / 10} y1={14} y2={44} stroke="#fff" strokeOpacity={0.45} />)}
+      {[0, 25, 50, 75, 100].map((t) => <text key={t} x={x0 + (W * t) / 100} y={62} textAnchor="middle" fill="#8d99b3" fontSize={10}>{t} %</text>)}
+      {label && <text x={x0 + (W * Math.min(100, pct)) / 200} y={34} textAnchor="middle" fill="#1b1303" fontSize={12} fontWeight={700}>{label}</text>}
+    </svg>
+  );
+}
+
+function DoubleLineV({ total, unit = "", marks, hideTotal }: { total: number; unit?: string; hideTotal?: boolean; marks: { pct: number; showAmount?: boolean }[] }) {
+  const x0 = 46, W = 268, X = (p: number) => x0 + (W * p) / 100;
+  const amt = (p: number) => { const v = (total * p) / 100; return Number.isInteger(v) ? sv(v) : sv(Math.round(v * 100) / 100).replace(".", ","); };
+  const u = unit ? `\u00a0${unit}` : "";
+  return (
+    <svg viewBox="0 0 340 130" className="w-full max-w-md" role="img" aria-label="Dubbel tallinje: procent och antal">
+      <text x={0} y={34} fill="#8d99b3" fontSize={10}>Procent</text>
+      <text x={0} y={104} fill="#8d99b3" fontSize={10}>Antal</text>
+      <line x1={x0} x2={x0 + W} y1={30} y2={30} stroke="#fff" strokeWidth={2} />
+      <line x1={x0} x2={x0 + W} y1={100} y2={100} stroke="#fff" strokeWidth={2} />
+      {Array.from({ length: 11 }, (_, i) => <g key={i}><line x1={X(i * 10)} x2={X(i * 10)} y1={i % 5 === 0 ? 22 : 26} y2={i % 5 === 0 ? 38 : 34} stroke="#fff" strokeOpacity={i % 5 === 0 ? 1 : 0.6} /><line x1={X(i * 10)} x2={X(i * 10)} y1={i % 5 === 0 ? 92 : 96} y2={i % 5 === 0 ? 108 : 104} stroke="#fff" strokeOpacity={i % 5 === 0 ? 1 : 0.6} /></g>)}
+      {[0, 50, 100].map((p) => <text key={p} x={X(p)} y={18} textAnchor="middle" fill="#8d99b3" fontSize={10}>{p} %</text>)}
+      {[0, 100].map((p) => <text key={p} x={X(p)} y={124} textAnchor="middle" fill="#8d99b3" fontSize={10}>{p === 0 ? 0 : hideTotal ? "?" : sv(total)}{p === 0 || hideTotal ? "" : u}</text>)}
+      {marks.map((m, i) => (
+        <g key={i}>
+          <line x1={X(m.pct)} x2={X(m.pct)} y1={30} y2={100} stroke={GOLD} strokeDasharray="3 3" />
+          <circle cx={X(m.pct)} cy={30} r={5} fill={GOLD} /><circle cx={X(m.pct)} cy={100} r={5} fill={GOLD} />
+          <text x={X(m.pct)} y={52} textAnchor="middle" fill={GOLD} fontSize={11} fontWeight={700}>{m.pct} %</text>
+          <text x={X(m.pct)} y={84} textAnchor="middle" fill={GOLD} fontSize={11} fontWeight={700}>{m.showAmount === false ? "?" : amt(m.pct) + u}</text>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
 function AreaV({ a, b }: { a: number; b: number }) {
   const c = Math.min(26, 280 / Math.max(a, 1), 160 / Math.max(b, 1));
   return (
@@ -200,6 +238,8 @@ export function VisualView({ v }: { v: Visual }) {
     case "fractionbars": return <FractionBarsV bars={v.bars} />;
     case "decimalplace": return <DecimalPlaceV value={v.value} />;
     case "decimalgrid": return <DecimalGridV hundredths={v.hundredths} />;
+    case "percentbar": return <PercentBarV pct={v.pct} label={v.label} />;
+    case "doublenumberline": return <DoubleLineV total={v.total} unit={v.unit} hideTotal={v.hideTotal} marks={v.marks} />;
     case "fractioncircle": return <FractionCircleV parts={v.parts} shaded={v.shaded} />;
     case "fractionset": return <FractionSetV total={v.total} groups={v.groups} shadedGroups={v.shadedGroups} />;
     case "area": return <AreaV a={v.a} b={v.b} />;
