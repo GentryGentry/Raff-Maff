@@ -319,3 +319,119 @@ export function ClockV({ h, m }: { h: number; m: number }) {
     </svg>
   );
 }
+
+const COLORS: Record<string, string> = { röd: "#ef4444", blå: "#3b82f6", grön: "#22c55e", gul: "#facc15", lila: "#a855f7" };
+
+function axisTicks(min: number, max: number, step: number) {
+  const out: number[] = [];
+  for (let v = min; v <= max + 1e-9; v += step) out.push(v);
+  return out;
+}
+
+/** Bar chart. With `min` > 0 the axis is cut off (used to show how truncated axes mislead). */
+export function BarChartV({ cats, vals, max, step, min = 0, unit }: { cats: string[]; vals: number[]; max: number; step: number; min?: number; unit?: string }) {
+  const W = 320, H = 200, left = 34, bottom = 34, top = 14, right = 10;
+  const pw = W - left - right, ph = H - top - bottom, bw = Math.min(40, (pw / cats.length) * 0.6);
+  const Y = (v: number) => top + ph - ((v - min) / (max - min)) * ph;
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-sm" role="img" aria-label="Stapeldiagram">
+      {axisTicks(min, max, step).map((t) => (
+        <g key={t}>
+          <line x1={left} y1={Y(t)} x2={W - right} y2={Y(t)} stroke={LINE} strokeWidth={t === min ? 1.6 : 0.8} />
+          <text x={left - 5} y={Y(t) + 4} textAnchor="end" fill={MUTED} fontSize={11}>{t}</text>
+        </g>
+      ))}
+      {step % 2 === 0 && axisTicks(min + step / 2, max - step / 2, step).map((t) => <line key={`m${t}`} x1={left} y1={Y(t)} x2={W - right} y2={Y(t)} stroke={LINE} strokeWidth={0.4} strokeDasharray="2 3" />)}
+      {cats.map((c, i) => {
+        const cx = left + (pw / cats.length) * (i + 0.5);
+        return (
+          <g key={c}>
+            <rect x={cx - bw / 2} y={Y(vals[i])} width={bw} height={Math.max(0, Y(min) - Y(vals[i]))} rx={2} fill={BLUE} />
+            <text x={cx} y={H - bottom + 15} textAnchor="middle" fill="#fff" fontSize={11}>{c}</text>
+          </g>
+        );
+      })}
+      {unit && <text x={4} y={10} fill={GOLD} fontSize={11}>{unit}</text>}
+    </svg>
+  );
+}
+
+export function LineChartV({ xs, ys, max, step, min = 0, unit }: { xs: string[]; ys: number[]; max: number; step: number; min?: number; unit?: string }) {
+  const W = 320, H = 200, left = 34, bottom = 34, top = 14, right = 14;
+  const pw = W - left - right, ph = H - top - bottom;
+  const Y = (v: number) => top + ph - ((v - min) / (max - min)) * ph;
+  const X = (i: number) => left + (pw / (xs.length - 1)) * i;
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-sm" role="img" aria-label="Linjediagram">
+      {axisTicks(min, max, step).map((t) => (
+        <g key={t}><line x1={left} y1={Y(t)} x2={W - right} y2={Y(t)} stroke={LINE} strokeWidth={t === min ? 1.6 : 0.8} /><text x={left - 5} y={Y(t) + 4} textAnchor="end" fill={MUTED} fontSize={11}>{t}</text></g>
+      ))}
+      <polyline points={ys.map((y, i) => `${X(i)},${Y(y)}`).join(" ")} fill="none" stroke={GOLD} strokeWidth={2.5} strokeLinejoin="round" />
+      {ys.map((y, i) => <circle key={i} cx={X(i)} cy={Y(y)} r={4} fill={GOLD} stroke="#0b1428" strokeWidth={1.5} />)}
+      {xs.map((x, i) => <text key={x} x={X(i)} y={H - bottom + 15} textAnchor="middle" fill="#fff" fontSize={11}>{x}</text>)}
+      {unit && <text x={4} y={10} fill={GOLD} fontSize={11}>{unit}</text>}
+    </svg>
+  );
+}
+
+export function PictogramV({ rows, per }: { rows: { label: string; count: number }[]; per: number }) {
+  const rh = 28, lw = 74;
+  const maxN = Math.max(...rows.map((r) => r.count), 1);
+  const W = lw + maxN * 24 + 12;
+  return (
+    <svg viewBox={`0 0 ${Math.max(W, 220)} ${rows.length * rh + 30}`} className="w-full max-w-sm" role="img" aria-label="Piktogram">
+      {rows.map((r, i) => (
+        <g key={r.label}>
+          <text x={4} y={i * rh + 20} fill="#fff" fontSize={12}>{r.label}</text>
+          {Array.from({ length: r.count }, (_, k) => <circle key={k} cx={lw + k * 24 + 10} cy={i * rh + 15} r={9} fill={GOLD} />)}
+        </g>
+      ))}
+      <circle cx={14} cy={rows.length * rh + 16} r={7} fill={GOLD} />
+      <text x={28} y={rows.length * rh + 20} fill={GOLD} fontSize={12}>= {per}</text>
+    </svg>
+  );
+}
+
+export function MarblesV({ counts }: { counts: { color: string; n: number }[] }) {
+  const all = counts.flatMap((c) => Array.from({ length: c.n }, () => c.color));
+  const perRow = 8, r = 13;
+  const rows = Math.ceil(all.length / perRow);
+  return (
+    <svg viewBox={`0 0 ${perRow * 32 + 16} ${rows * 32 + 16}`} className="w-full max-w-xs" role="img" aria-label="Påse med kulor">
+      <rect x={2} y={2} width={perRow * 32 + 12} height={rows * 32 + 12} rx={14} fill="#182848" stroke={LINE} />
+      {all.map((c, i) => <circle key={i} cx={16 + (i % perRow) * 32 + 8} cy={16 + Math.floor(i / perRow) * 32 + 4} r={r} fill={COLORS[c] ?? "#999"} stroke="#fff" strokeOpacity={0.5} />)}
+    </svg>
+  );
+}
+
+export function SpinnerV({ sectors }: { sectors: string[] }) {
+  const n = sectors.length, cx = 90, cy = 90, r = 78;
+  const pt = (k: number): P2 => [cx + r * Math.sin((k / n) * 2 * Math.PI), cy - r * Math.cos((k / n) * 2 * Math.PI)];
+  return (
+    <svg viewBox="0 0 180 180" className="w-full max-w-[13rem]" role="img" aria-label="Snurra">
+      {sectors.map((c, i) => { const a = pt(i), b = pt(i + 1); return <path key={i} d={`M ${cx} ${cy} L ${a[0]} ${a[1]} A ${r} ${r} 0 0 1 ${b[0]} ${b[1]} Z`} fill={COLORS[c] ?? "#999"} stroke="#fff" strokeWidth={2} />; })}
+      <circle cx={cx} cy={cy} r={5} fill="#0b1428" />
+      <polygon points={`${cx},${cy - 8} ${cx - 6},${cy - 24} ${cx + 6},${cy - 24}`} fill="#fff" transform={`rotate(20 ${cx} ${cy})`} />
+    </svg>
+  );
+}
+
+export function ComboTableV({ rows, cols }: { rows: string[]; cols: string[] }) {
+  const cw = 54, rh = 30, lw = 70;
+  return (
+    <svg viewBox={`0 0 ${lw + cols.length * cw + 8} ${(rows.length + 1) * rh + 8}`} className="w-full max-w-sm" role="img" aria-label="Kombinationstabell">
+      {cols.map((c, j) => <text key={c} x={lw + j * cw + cw / 2} y={rh - 9} textAnchor="middle" fill={GOLD} fontSize={12} fontWeight={700}>{c}</text>)}
+      {rows.map((r, i) => (
+        <g key={r}>
+          <text x={4} y={(i + 1) * rh + 20} fill={GOLD} fontSize={12} fontWeight={700}>{r}</text>
+          {cols.map((c, j) => (
+            <g key={c}>
+              <rect x={lw + j * cw + 2} y={(i + 1) * rh + 3} width={cw - 4} height={rh - 4} rx={5} fill={BLUE} fillOpacity={0.3} stroke="#fff" strokeOpacity={0.4} />
+              <text x={lw + j * cw + cw / 2} y={(i + 1) * rh + 22} textAnchor="middle" fill="#fff" fontSize={12}>{r[0]}{c[0]}</text>
+            </g>
+          ))}
+        </g>
+      ))}
+    </svg>
+  );
+}

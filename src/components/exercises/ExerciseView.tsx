@@ -8,7 +8,7 @@ import type { Answer, ExerciseSpec } from "@/lib/engine/types";
 
 export interface ExProps { spec: ExerciseSpec; value: Answer | undefined; onChange: (a: Answer) => void; disabled?: boolean }
 
-const TEXT_SKILLS = /^(w1-l9|w5|w8)\./; // roman numerals, fractions ("3/4") and negative numbers need a full keyboard
+const TEXT_SKILLS = /^(w1-l9|w5|w8|w12-l4|w12-l5)\./; // roman numerals, fractions ("3/4") and negative numbers need a full keyboard
 
 export function emptyAnswer(spec: ExerciseSpec): Answer {
   switch (spec.kind) {
@@ -21,6 +21,7 @@ export function emptyAnswer(spec: ExerciseSpec): Answer {
     case "longdiv": return { kind: "longdiv", q: [], prod: [], rem: [] };
     case "gridshade": return { kind: "gridshade", value: 0 };
     case "point": return { kind: "point", x: null, y: null };
+    case "bars": return { kind: "bars", values: spec.cats.map(() => 0) };
     case "expr": return { kind: "expr", value: "" };
     case "multifield": return { kind: "multifield", values: spec.fields.map(() => "") };
     case "text": return { kind: "text", value: "" };
@@ -36,6 +37,7 @@ export function isAnswered(spec: ExerciseSpec, a: Answer | undefined): boolean {
     case "fractionbar": case "gridshade": return a.value > 0;
     case "expr": return a.value.trim() !== "";
     case "point": return a.x !== null && a.y !== null;
+    case "bars": return a.values.some((v) => v > 0);
     case "areamodel": return a.total.trim() !== "";
     case "longdiv": return a.q.some((x) => (x ?? "").trim() !== "");
     case "multifield": return a.values.some((v) => v.trim() !== "");
@@ -220,6 +222,31 @@ function ExprInput({ spec, value, onChange, disabled }: ExProps & { spec: Extrac
   );
 }
 
+/* ───────── build a bar chart ───────── */
+function BarsInput({ spec, value, onChange, disabled }: ExProps & { spec: Extract<ExerciseSpec, { kind: "bars" }> }) {
+  const vals = value?.kind === "bars" ? value.values : spec.cats.map(() => 0);
+  const set = (i: number, v: number) => { const n = [...vals]; n[i] = Math.max(0, Math.min(spec.max, v)); onChange({ kind: "bars", values: n }); };
+  const H = 150;
+  return (
+    <div className="space-y-2">
+      <div className="flex items-end justify-center gap-2">
+        {spec.cats.map((c, i) => (
+          <div key={c} className="flex w-16 flex-col items-center gap-1">
+            <button type="button" className="btn btn-ghost min-h-[44px] w-full px-0 text-lg" disabled={disabled} aria-label={`Öka stapel ${c}`} onClick={() => set(i, vals[i] + 1)}>+</button>
+            <div className="relative flex w-full items-end justify-center rounded bg-[#0b1428]" style={{ height: H }}>
+              <div className="w-10 rounded-t bg-[#e8b64a]" style={{ height: (vals[i] / spec.max) * H }} />
+              <span className="absolute top-1 text-xs text-[#8d99b3]">{vals[i]}</span>
+            </div>
+            <button type="button" className="btn btn-ghost min-h-[44px] w-full px-0 text-lg" disabled={disabled} aria-label={`Minska stapel ${c}`} onClick={() => set(i, vals[i] - 1)}>−</button>
+            <span className="text-center text-xs text-[#c3cce0]">{c}</span>
+          </div>
+        ))}
+      </div>
+      <p className="text-center text-xs text-[#8d99b3]">Staplarnas höjd räknas i hela enheter (högst {spec.max}). Använd + och − under varje stapel.</p>
+    </div>
+  );
+}
+
 /* ───────── tap a point in a coordinate system ───────── */
 function PointInput({ spec, value, onChange, disabled }: ExProps & { spec: Extract<ExerciseSpec, { kind: "point" }> }) {
   const p = value?.kind === "point" && value.x !== null && value.y !== null ? { x: value.x, y: value.y } : null;
@@ -324,6 +351,7 @@ export function ExerciseView({ spec, value, onChange, disabled }: ExProps) {
       {spec.kind === "longdiv" && <LongDivInput {...props} spec={spec} />}
       {spec.kind === "gridshade" && <GridShadeInput {...props} />}
       {spec.kind === "point" && <PointInput {...props} spec={spec} />}
+      {spec.kind === "bars" && <BarsInput {...props} spec={spec} />}
       {spec.kind === "expr" && <ExprInput {...props} spec={spec} />}
       {spec.kind === "fractionbar" && (
         <div className="space-y-2">

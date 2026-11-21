@@ -52,6 +52,8 @@ function expectedAnswerText(sol: Solution, spec: ConcreteExercise["spec"]): stri
       return sol.accept;
     case "point":
       return `(${sol.x}, ${sol.y})`;
+    case "bars":
+      return sol.values.join(", ");
     case "longdiv":
       return `${sol.quotient}${sol.remainder ? ` rest ${sol.remainder}` : ""}`;
     case "multifield":
@@ -93,6 +95,12 @@ export function gradeExercise(ex: ConcreteExercise, ans: Answer | undefined): It
       if (a.x === sol.x && a.y === sol.y) return { ...base, points: 1, max: 1, correct: true, feedback: "Rätt!" };
       const hint = a.y === sol.y ? "x-värdet stämmer inte." : a.x === sol.x ? "y-värdet stämmer inte." : a.x === sol.y && a.y === sol.x ? "Du har bytt plats på x och y: gå först åt sidan (x), sedan uppåt (y)." : "Gå först åt sidan (x) och sedan uppåt (y).";
       return wrong(`Inte riktigt. ${hint}`);
+    }
+    case "bars": {
+      const a = ans as Extract<Answer, { kind: "bars" }>;
+      const n = sol.values.length;
+      const good = sol.values.filter((v, i) => (a.values?.[i] ?? 0) === v).length;
+      return { ...base, points: good / n, max: 1, correct: good === n, feedback: good === n ? "Rätt!" : `${good} av ${n} staplar stämmer. Jämför varje stapel med tabellen.` };
     }
     case "multifield": {
       const a = ans as Extract<Answer, { kind: "multifield" }>;
@@ -201,6 +209,7 @@ export function perfectAnswer(ex: ConcreteExercise): Answer {
     case "gridshade": return { kind: "gridshade", value: s.value };
     case "expr": return { kind: "expr", value: s.accept };
     case "point": return { kind: "point", x: s.x, y: s.y };
+    case "bars": return { kind: "bars", values: s.values };
     case "column": return { kind: "column", result: s.result, carries: s.carries, partials: s.partials };
     case "areamodel": return { kind: "areamodel", cells: s.cells, total: s.total };
     case "longdiv": return { kind: "longdiv", q: s.q, prod: s.prod, rem: s.rem };

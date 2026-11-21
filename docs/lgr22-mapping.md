@@ -45,10 +45,10 @@ kravinnehåll.
 | Omkrets och area hos tvådimensionella figurer | V10 L2 (omkrets), L3 (area), L4 (parallellogram och trianglar) | ✅ |
 | Skala vid förminskning och förstoring | V11 L6 (ritningar, kartor, förstoring 10:1) | ✅ |
 | Symmetri i planet | V10 L7 (symmetrilinjer, spegling i lodrät/vågrät linje) | ✅ (linjesymmetri) |
-| Slumpmässiga händelser, chans och risk; jämföra sannolikhet | V12 | 🚧 |
-| Enkel kombinatorik | V12 | 🚧 |
-| Tabeller och diagram; tolkning av data | V12 | 🚧 |
-| Lägesmått: medelvärde, typvärde, median | V12 | 🚧 |
+| Slumpmässiga händelser, chans och risk; jämföra sannolikhet | V12 L4 (sannolikhet), L5 (experiment, relativ frekvens, förväntat antal) | ✅ |
+| Enkel kombinatorik | V12 L6 | ✅ |
+| Tabeller och diagram; tolkning av data | V12 L1, L7 (granska vilseledande diagram, urval, samband/orsak) | ✅ (cirkeldiagram bara som begrepp) |
+| Lägesmått: medelvärde, typvärde, median | V12 L2–L3 (även variationsbredd) | ✅ |
 | Proportionalitet i bråk-, decimal- och procentform | V7 L5 (dubbel tallinje, proportionalitet i procentform), V7 L3–L4, L7; bråk som del av antal i V5 L7 | ✅ (procent) · grafer 🚧 |
 | Koordinatsystem och gradering av koordinataxlar | V10 L8 (första kvadranten, punkter, avstånd, rektanglar, regler och tabeller) | ✅ (första kvadranten) |
 | Grafer för proportionella samband | V10 L8 (regel → tabell → punkter på en linje, enkelt); egentliga grafer av proportionella samband föreslås i V12 | ✅ delvis |

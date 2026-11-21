@@ -311,3 +311,7 @@ export function perimeterPts(pts: P2[]): number {
 export function lShape(w: number, h: number, nw: number, nh: number): P2[] {
   return [[0, 0], [w, 0], [w, h - nh], [w - nw, h - nh], [w - nw, h], [0, h]];
 }
+
+export function barsEx(id: string, skill: string, prompt: string, cats: string[], values: number[], max: number, explanation: string, hints: string[]): ConcreteExercise {
+  return { spec: { kind: "bars", id, skill, prompt, cats, max }, solution: { kind: "bars", values }, explanation, hints };
+}

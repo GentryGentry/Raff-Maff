@@ -41,6 +41,7 @@ const LABEL: Record<string, string> = { knowledge: "Kunskapsprov", method: "Skri
           case "numberline": for (let k = 0; k < Math.round((s.value - spec.min) / spec.step); k++) await page.getByRole("button", { name: "Flytta ett steg åt höger" }).click(); break;
           case "fractionbar": await page.locator('svg[aria-label^="Bråkstapel"] rect').nth(s.value - 1).click(); break;
           case "expr": await page.getByLabel("Ditt uttryck").fill(s.accept); break;
+          case "bars": for (let k = 0; k < spec.cats.length; k++) for (let j = 0; j < s.values[k]; j++) await page.getByRole("button", { name: `Öka stapel ${spec.cats[k]}`, exact: true }).click(); break;
           case "point": await page.locator(`[aria-label="Punkt (${s.x}, ${s.y})"]`).click(); break;
           case "gridshade": await page.locator('svg[aria-label^="Hundrarutnät – tryck"] rect').nth(s.value - 1).click(); break;
           case "areamodel": for (let k = 0; k < s.cells.length; k++) await page.locator('input[aria-label*=" gånger "]').nth(k).fill(s.cells[k]); await page.locator("label:has-text('Summa') input").fill(s.total); break;

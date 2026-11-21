@@ -52,6 +52,12 @@ export type Visual =
   | { type: "angle"; deg: number; protractor?: boolean; base?: "left" | "right"; label?: string }
   | ({ type: "coordplane" } & PlaneSpec)
   | { type: "cuboid"; l: number; b: number; h: number; labels?: [string, string, string] }
+  | { type: "barchart"; cats: string[]; vals: number[]; max: number; step: number; min?: number; unit?: string }
+  | { type: "linechart"; xs: string[]; ys: number[]; max: number; step: number; min?: number; unit?: string }
+  | { type: "pictogram"; rows: { label: string; count: number }[]; per: number }
+  | { type: "marbles"; counts: { color: string; n: number }[] } // color: röd | blå | grön | gul | lila
+  | { type: "spinner"; sectors: string[] } // equal sectors, colour names
+  | { type: "combotable"; rows: string[]; cols: string[] }
   | { type: "ruler"; cm: number; from: number; to: number } // from/to in mm
   | { type: "clock"; h: number; m: number }
   | { type: "circle"; line: "radius" | "diameter" | "both"; rLabel?: string; dLabel?: string }
@@ -70,6 +76,7 @@ export type ExerciseSpec =
   | { kind: "longdiv"; id: string; skill: string; prompt: string; a: number; b: number; p0: number }
   | { kind: "gridshade"; id: string; skill: string; prompt: string }
   | { kind: "point"; id: string; skill: string; prompt: string; plane: PlaneSpec }
+  | { kind: "bars"; id: string; skill: string; prompt: string; cats: string[]; max: number }
   | { kind: "expr"; id: string; skill: string; prompt: string; variable: string; visual?: Visual }
   | { kind: "multifield"; id: string; skill: string; prompt: string; fields: { label: string; suffix?: string }[]; visual?: Visual }
   | { kind: "text"; id: string; skill: string; prompt: string; scenario?: string; minChars: number };
@@ -84,6 +91,7 @@ export type Answer =
   | { kind: "longdiv"; q: string[]; prod: string[]; rem: string[] }
   | { kind: "gridshade"; value: number }
   | { kind: "point"; x: number | null; y: number | null }
+  | { kind: "bars"; values: number[] }
   | { kind: "expr"; value: string }
   | { kind: "multifield"; values: string[] }
   | { kind: "text"; value: string };
@@ -99,6 +107,7 @@ export type Solution =
   | { kind: "longdiv"; q: string[]; prod: string[]; rem: string[]; quotient: number; remainder: number }
   | { kind: "gridshade"; value: number }
   | { kind: "point"; x: number; y: number }
+  | { kind: "bars"; values: number[] }
   | { kind: "expr"; accept: string; simplified?: boolean }
   | { kind: "multifield"; values: string[][] } // each field: list of accepted values
   | { kind: "text"; rubric: Rubric; modelAnswer: string };
