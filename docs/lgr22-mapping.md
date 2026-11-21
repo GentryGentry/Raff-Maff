@@ -9,7 +9,8 @@ Status: ✅ byggd lektion · 🚧 planerad (värld finns på kartan men saknar i
 
 | Centralt innehåll (åk 4–6) | Var i Raff Maff | Status |
 |---|---|---|
-| Rationella tal, däribland negativa tal, och deras egenskaper samt hur talen kan delas upp och användas | V1 L1–L3, L8 (egenskaper – *fördjupning*, se not); V5 L2–L4, L6 (bråk som tal: tallinje, likvärdiga bråk, jämförelse, blandad form); V8 negativa tal | V1, V5 ✅ · V8 🚧 |
+| Rationella tal, däribland negativa tal, och deras egenskaper samt hur talen kan delas upp och användas | V1 L1–L3, L8 (egenskaper – *fördjupning*, se not); V5 L2–L4, L6 (bråk som tal); V8 L1–L6 (negativa tal: tallinje, motsatta tal, jämförelse, addition/subtraktion, vardag) | V1, V5, V8 ✅ |
+| Subtraktion av negativa tal, a − (−b) | V8 L5 – *fördjupning*: ingår inte uttryckligen i åk 4–6 (hör till åk 7–9); behandlas som skillnad/avstånd | ✅ (fördjupning) |
 | Positionssystemet för hela tal och tal i decimalform | V1 L1–L3, L7; V6 L1–L3, L5 (tiondelar, hundradelar, tallinje, jämförelse, gånger/delat med 10, 100, 1 000) | V1, V6 ✅ |
 | Olika talsystem och några talsystem som används i olika kulturer genom historien | V1 L9 (romerska siffror, babyloniskt/egyptiskt/indiskt) | ✅ |
 | Tal i procentform och deras samband med tal i bråk- och decimalform | V7 L1–L2 (procent som hundradelar, bråk ↔ decimaltal ↔ procent), V7 L3–L7, L9–L10 (procent av, andel, helhet, jämförelse, vardag) | ✅ |
