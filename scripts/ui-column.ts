@@ -11,7 +11,7 @@ const LESSON = process.argv[3] ?? "w2-l3";
   await page.goto(`http://localhost:3000/lektion/${LESSON}?steg=10`);
   await page.waitForSelector("text=Skriftlig metod");
   await page.locator("div.card", { hasText: "Skriftlig metod" }).getByRole("button").first().click();
-  await page.waitForSelector("text=/Ställ upp och räkna|liggande stolen/");
+  await page.waitForSelector("text=/Ställ upp|liggande stolen/");
   const p = JSON.parse(Buffer.from(token.split(".")[0], "base64url").toString());
   const ex = generateAssessment(p.l, p.k, p.s);
   for (let i = 0; i < ex.length; i++) {
