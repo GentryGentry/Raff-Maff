@@ -29,11 +29,12 @@ kravinnehåll.
 
 | Centralt innehåll | Var | Status |
 |---|---|---|
-| Matematiska likheter och hur likhetstecknet används för att teckna enkla ekvationer | V2 L5 (saknade tal), V9 | delvis ✅ / 🚧 |
-| Variabler och deras användning i enkla algebraiska uttryck och ekvationer | V9 | 🚧 |
-| Metoder, däribland algebraiska, för att lösa enkla ekvationer | V9 | 🚧 |
-| Mönster i talföljder och geometriska mönster | V1 L4 (talföljder), V9 | delvis ✅ / 🚧 |
-| Programmering i visuella programmeringsmiljöer; algoritmer | – | ➖ **ingen värld** |
+| Matematiska likheter och hur likhetstecknet används för att teckna enkla ekvationer | V2 L5 (saknade tal), V9 L1 (likhetstecknet), L5 (balansmodellen), L7 (text till ekvation) | ✅ |
+| Variabler och deras användning i enkla algebraiska uttryck och ekvationer | V9 L4 (variabler, uttryck), L5–L7 (ekvationer), L9 (förenkla uttryck – *fördjupning*) | ✅ |
+| Metoder, däribland algebraiska, för att lösa enkla ekvationer | V9 L5–L6 (balansmodell, ett och två steg), L7 | ✅ |
+| Mönster i talföljder och geometriska mönster samt hur de konstrueras, beskrivs och uttrycks | V1 L4, V9 L2 (talföljder), V9 L3 (figurmönster och regel med bokstav) | ✅ |
+| Entydiga stegvisa instruktioner och hur de konstrueras, beskrivs och följs; hur algoritmer skapas och används | V9 L8 (algoritmer: upprepning, villkor, spåra och rätta) | ✅ delvis |
+| Programmering i *visuella programmeringsmiljöer* | – | ➖ **ingen värld** – ingen programmeringsmiljö finns i appen; V9 L8 täcker bara tänkandet bakom (algoritmer) |
 
 ## Geometri · Sannolikhet och statistik · Samband och förändring · Problemlösning
 
@@ -55,6 +56,6 @@ kravinnehåll.
 
 ## Luckor att besluta om
 
-1. **Programmering/algoritmer** står i centralt innehåll för åk 4–6 men finns inte bland de 13 världarna.
+1. **Programmering i visuella miljöer** står i centralt innehåll för åk 4–6 men finns inte bland de 13 världarna. Algoritmer som tankesätt täcks nu av V9 L8, men appen har ingen programmeringsmiljö.
 2. **Samband och förändring** (proportionalitet, koordinatsystem, grafer) är ett eget område i Lgr22 men har ingen värld; placeringen ovan är ett förslag.
 3. Fördelningen på åk 4, 5 och 6 görs *inte* i centralt innehåll (det gäller åk 4–6 som helhet). Lektionerna är därför märkta "åk 4–6" och ordnade efter kunskapsprogression, inte efter årskurs.

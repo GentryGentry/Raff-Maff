@@ -240,19 +240,20 @@ function BalanceV({ left, right, tilt = "level" }: { left: string; right: string
 }
 
 function DotPatternV({ figures }: { figures: number[][] }) {
-  const s = 15, gap = 26;
+  const s = 15, gap = 18, minSlot = 50; // each figure gets a slot wide enough for its "Figur n" label
   const maxH = Math.max(...figures.flat(), 1);
-  const widths = figures.map((f) => f.length * s);
-  const total = widths.reduce((a, b) => a + b, 0) + gap * (figures.length - 1);
+  const slots = figures.map((f) => Math.max(f.length * s, minSlot));
+  const total = slots.reduce((a, b) => a + b, 0) + gap * (figures.length - 1);
   let x = 0;
   return (
     <svg viewBox={`0 0 ${total + 4} ${maxH * s + 26}`} className="w-full max-w-md" role="img" aria-label="Figurer av rutor">
       {figures.map((f, fi) => {
-        const x0 = x; x += widths[fi] + gap;
+        const slotX = x; x += slots[fi] + gap;
+        const x0 = slotX + (slots[fi] - f.length * s) / 2;
         return (
           <g key={fi}>
             {f.map((h, c) => Array.from({ length: h }, (_, r) => <rect key={`${c}-${r}`} x={x0 + c * s} y={maxH * s - (r + 1) * s} width={s - 1.5} height={s - 1.5} rx={2} fill="#3b82f6" fillOpacity={0.8} stroke="#fff" strokeOpacity={0.4} strokeWidth={0.6} />))}
-            <text x={x0 + widths[fi] / 2} y={maxH * s + 16} textAnchor="middle" fill="#8d99b3" fontSize={11}>Figur {fi + 1}</text>
+            <text x={slotX + slots[fi] / 2} y={maxH * s + 16} textAnchor="middle" fill="#8d99b3" fontSize={11}>Figur {fi + 1}</text>
           </g>
         );
       })}
