@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import type { Visual } from "@/lib/engine/types";
-import { sv } from "@/lib/engine/gen-helpers";
+import { sv, tickLabel } from "@/lib/engine/gen-helpers";
 
 const GOLD = "#e8b64a";
 const LINE = "#3a4c78";
@@ -52,8 +52,8 @@ function BaseTen({ value }: { value: number }) {
   );
 }
 
-function NumberLineV({ min, max, step, marks = [], labelEvery, den }: { min: number; max: number; step: number; marks?: number[]; labelEvery?: number; den?: number }) {
-  const fmt = (v: number) => (den ? (v % den === 0 ? String(v / den) : `${v}/${den}`) : sv(v));
+function NumberLineV({ min, max, step, marks = [], labelEvery, den, dp }: { min: number; max: number; step: number; marks?: number[]; labelEvery?: number; den?: number; dp?: number }) {
+  const fmt = (v: number) => tickLabel(v, den, dp);
   const n = Math.round((max - min) / step);
   const x = (v: number) => 16 + ((v - min) / (max - min)) * 288;
   const le = labelEvery ?? (max - min);
@@ -122,6 +122,38 @@ function FractionSetV({ total, groups, shadedGroups }: { total: number; groups: 
   );
 }
 
+function DecimalPlaceV({ value }: { value: string }) {
+  const [ip, fp = ""] = value.split(",");
+  const ints = ["Ental", "Tiotal", "Hundratal", "Tusental"], decs = ["Tiondel", "Hundradel", "Tusendel", "Tiotusendel"];
+  const cols = [...ip.split("").map((d, i) => ({ d, n: ints[ip.length - 1 - i] })), ...fp.split("").map((d, i) => ({ d, n: decs[i] }))];
+  const w = Math.min(58, 300 / (cols.length + 0.4));
+  return (
+    <svg viewBox={`0 0 ${cols.length * w + 18} 100`} className="w-full max-w-sm" role="img" aria-label={`Platsvärdestabell för ${value}`}>
+      {cols.map((c, i) => {
+        const isDec = i >= ip.length, x = 4 + i * w + (isDec ? 10 : 0);
+        return (
+          <g key={i} transform={`translate(${x},4)`}>
+            <rect width={w - 4} height={36} rx={6} fill={isDec ? "#16294d" : "#182848"} stroke={LINE} />
+            <text x={(w - 4) / 2} y={24} textAnchor="middle" fill="#8d99b3" fontSize={Math.min(9.5, w / 6)}>{c.n}</text>
+            <rect y={42} width={w - 4} height={52} rx={6} fill="#0b1428" stroke={c.d === "0" ? LINE : GOLD} />
+            <text x={(w - 4) / 2} y={78} textAnchor="middle" fill="#fff" fontSize={28} fontWeight={700}>{c.d}</text>
+          </g>
+        );
+      })}
+      {fp && <text x={4 + ip.length * w + 4} y={82} fontSize={30} fontWeight={800} fill={GOLD}>,</text>}
+    </svg>
+  );
+}
+
+function DecimalGridV({ hundredths }: { hundredths: number }) {
+  const c = 20;
+  return (
+    <svg viewBox="0 0 208 208" className="w-52" role="img" aria-label={`Hundrarutnät med ${hundredths} av 100 rutor färgade`}>
+      {Array.from({ length: 100 }, (_, i) => <rect key={i} x={4 + (i % 10) * c} y={4 + Math.floor(i / 10) * c} width={c - 1.5} height={c - 1.5} rx={2} fill={i < hundredths ? GOLD : "#0b1428"} fillOpacity={i < hundredths ? 0.9 : 1} stroke="#3a4c78" strokeWidth={0.6} />)}
+    </svg>
+  );
+}
+
 function AreaV({ a, b }: { a: number; b: number }) {
   const c = Math.min(26, 280 / Math.max(a, 1), 160 / Math.max(b, 1));
   return (
@@ -166,6 +198,8 @@ export function VisualView({ v }: { v: Visual }) {
     case "numberline": return <NumberLineV {...v} />;
     case "fractionbar": return <FractionBarV parts={v.parts} shaded={v.shaded} />;
     case "fractionbars": return <FractionBarsV bars={v.bars} />;
+    case "decimalplace": return <DecimalPlaceV value={v.value} />;
+    case "decimalgrid": return <DecimalGridV hundredths={v.hundredths} />;
     case "fractioncircle": return <FractionCircleV parts={v.parts} shaded={v.shaded} />;
     case "fractionset": return <FractionSetV total={v.total} groups={v.groups} shadedGroups={v.shadedGroups} />;
     case "area": return <AreaV a={v.a} b={v.b} />;

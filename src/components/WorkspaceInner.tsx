@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Circle, Layer, Line, Rect, Stage, Text } from "react-konva";
 import type Konva from "konva";
 
-export type Preset = "grid" | "numberline" | "fraction" | "fractioncircle" | "area" | "coordinate" | "column";
+export type Preset = "grid" | "numberline" | "fraction" | "fractioncircle" | "hundredgrid" | "area" | "coordinate" | "column";
 type Tool = "pen" | "eraser" | "line" | "rect" | "circle" | "text";
 type Shape =
   | { t: "pen" | "eraser"; color: string; w: number; pts: number[] }
@@ -100,6 +100,13 @@ export default function WorkspaceInner({ preset = "grid", storageKey, height = 3
       const r = Math.min(w, height) / 2 - 24, cx = w / 2, cy = height / 2;
       els.push(<Circle key="fc" x={cx} y={cy} radius={r} stroke="#fff" strokeWidth={2} listening={false} />);
       if (parts > 1) for (let i = 0; i < parts; i++) { const a = (2 * Math.PI * i) / parts; els.push(<Line key={`fl${i}`} points={[cx, cy, cx + r * Math.sin(a), cy - r * Math.cos(a)]} stroke="#fff" strokeWidth={1.5} listening={false} />); }
+    }
+    if (preset === "hundredgrid") {
+      const c = Math.floor((Math.min(w, height) - 24) / 10), x0 = Math.round((w - c * 10) / 2), y0 = 12;
+      for (let i = 0; i <= 10; i++) {
+        els.push(<Line key={`hv${i}`} points={[x0 + i * c, y0, x0 + i * c, y0 + 10 * c]} stroke="#60a5fa" strokeWidth={i % 5 === 0 ? 1.5 : 0.8} listening={false} />);
+        els.push(<Line key={`hh${i}`} points={[x0, y0 + i * c, x0 + 10 * c, y0 + i * c]} stroke="#60a5fa" strokeWidth={i % 5 === 0 ? 1.5 : 0.8} listening={false} />);
+      }
     }
     if (preset === "area") {
       const cols = Math.floor((w - 40) / CELL), rows = 8;

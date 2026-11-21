@@ -8,7 +8,7 @@ import { gradeExercise } from "@/lib/engine/grading";
 import { columnEx } from "@/lib/engine/gen-helpers";
 import type { Answer } from "@/lib/engine/types";
 
-const PRESETS: [Preset, string][] = [["grid", "Rutat papper"], ["numberline", "Tallinje"], ["fraction", "Bråkstapel"], ["fractioncircle", "Bråkcirkel"], ["area", "Areamodell"], ["coordinate", "Koordinater"], ["column", "Kolumner"]];
+const PRESETS: [Preset, string][] = [["grid", "Rutat papper"], ["numberline", "Tallinje"], ["fraction", "Bråkstapel"], ["fractioncircle", "Bråkcirkel"], ["hundredgrid", "Hundrarutnät"], ["area", "Areamodell"], ["coordinate", "Koordinater"], ["column", "Kolumner"]];
 
 export default function WorkspacePage() {
   const [mode, setMode] = useState<"free" | "column">("free");

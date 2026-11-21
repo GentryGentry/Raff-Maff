@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Rich } from "@/components/Rich";
 import { FractionBarV, VisualView } from "@/components/visuals";
-import { sv } from "@/lib/engine/gen-helpers";
+import { sv, tickLabel } from "@/lib/engine/gen-helpers";
 import type { Answer, ExerciseSpec } from "@/lib/engine/types";
 
 export interface ExProps { spec: ExerciseSpec; value: Answer | undefined; onChange: (a: Answer) => void; disabled?: boolean }
@@ -38,7 +38,8 @@ export function isAnswered(spec: ExerciseSpec, a: Answer | undefined): boolean {
 }
 
 /* ───────── digit cells ───────── */
-function DigitRow({ n, value, onChange, disabled, label, tone }: { n: number; value: string; onChange: (v: string) => void; disabled?: boolean; label?: string; tone?: "gold" }) {
+const COMMA_SLOT = "flex h-11 w-3 items-end justify-center pb-1 text-2xl font-bold text-[#e8b64a]";
+function DigitRow({ n, value, onChange, disabled, label, tone, dp = 0 }: { n: number; value: string; onChange: (v: string) => void; disabled?: boolean; label?: string; tone?: "gold"; dp?: number }) {
   const [cells, setCells] = useState<string[]>(() => { const a = Array(n).fill(""); const v = value.replace(/\s/g, ""); for (let i = 0; i < v.length && i < n; i++) a[n - v.length + i] = v[i]; return a; });
   const refs = useRef<(HTMLInputElement | null)[]>([]);
   const set = (i: number, ch: string) => {
@@ -48,22 +49,30 @@ function DigitRow({ n, value, onChange, disabled, label, tone }: { n: number; va
   return (
     <div className="flex items-center justify-end gap-1" aria-label={label}>
       {cells.map((c, i) => (
-        <input key={i} ref={(el) => { refs.current[i] = el; }} value={c} disabled={disabled} inputMode="numeric" maxLength={1} aria-label={`${label ?? "siffra"} ${n - i}`}
+        <div key={i} className="flex items-center gap-1">
+        <input ref={(el) => { refs.current[i] = el; }} value={c} disabled={disabled} inputMode="numeric" maxLength={1} aria-label={`${label ?? "siffra"} ${n - i}`}
           onFocus={(e) => e.target.select()}
           onKeyDown={(e) => { if (e.key === "Backspace" && !cells[i] && i < n - 1) refs.current[i + 1]?.focus(); }}
           onChange={(e) => set(i, e.target.value.replace(/\D/g, "").slice(-1))}
           className={`h-11 w-9 rounded-lg border bg-[#070d1c] text-center text-xl font-semibold text-white ${tone === "gold" ? "border-[#e8b64a]/50" : "border-[#223660]"} focus:border-[#e8b64a] focus:outline-none`} />
+        {dp > 0 && n - 1 - i === dp && <span className={COMMA_SLOT} aria-hidden>,</span>}
+        </div>
       ))}
     </div>
   );
 }
 
-function StaticDigits({ s, n, sign }: { s: string; n: number; sign?: string }) {
-  const padded = s.padStart(n, " ").split("");
+function StaticDigits({ s, n, sign, dp = 0 }: { s: string; n: number; sign?: string; dp?: number }) {
+  const padded = (dp ? s.padStart(dp + 1, "0") : s).padStart(n, " ").split("");
   return (
     <div className="flex items-center justify-end gap-1">
       {sign && <span className="mr-1 w-5 text-xl text-[#e8b64a]">{sign}</span>}
-      {padded.map((c, i) => <div key={i} className="flex h-11 w-9 items-center justify-center text-2xl font-semibold">{c.trim()}</div>)}
+      {padded.map((c, i) => (
+        <div key={i} className="flex items-center gap-1">
+          <div className="flex h-11 w-9 items-center justify-center text-2xl font-semibold">{c.trim()}</div>
+          {dp > 0 && n - 1 - i === dp && <span className={COMMA_SLOT} aria-hidden>,</span>}
+        </div>
+      ))}
     </div>
   );
 }
@@ -73,7 +82,8 @@ function ColumnInput({ spec, value, onChange, disabled }: ExProps & { spec: Extr
   const sa = String(spec.a), sb = String(spec.b);
   const width = Math.max(sa.length, sb.length);
   const resultLen = String(spec.op === "add" ? spec.a + spec.b : spec.op === "sub" ? spec.a - spec.b : spec.a * spec.b).length;
-  const cols = Math.max(width + (spec.op === "add" ? 1 : 0), resultLen, spec.op === "mul" ? resultLen : 0);
+  const dp = spec.dp ?? 0;
+  const cols = Math.max(width + (spec.op === "add" ? 1 : 0), resultLen, spec.op === "mul" ? resultLen : 0, dp + 1);
   const sign = spec.op === "add" ? "+" : spec.op === "sub" ? "−" : "·";
   const upd = (patch: Partial<typeof a>) => onChange({ ...a, ...patch });
   const setIdx = (arr: string[], i: number, v: string) => { const n = [...arr]; while (n.length <= i) n.push(""); n[i] = v; return n; };
@@ -89,17 +99,18 @@ function ColumnInput({ spec, value, onChange, disabled }: ExProps & { spec: Extr
               const c = cols - 1 - k; // column index from right
               const idx = spec.op === "add" ? c - 1 : c;
               const valid = idx >= 0 && idx <= width - 2;
-              return valid ? (
-                <input key={k} value={a.carries[idx] ?? ""} disabled={disabled} inputMode="numeric" maxLength={1} aria-label={`${spec.op === "add" ? "minnessiffra" : "växling"} kolumn ${idx + 1}`}
+              const slot = dp > 0 && c === dp ? <span className="w-4" aria-hidden /> : null;
+              return <div key={k} className="flex items-center gap-1">{valid ? (
+                <input value={a.carries[idx] ?? ""} disabled={disabled} inputMode="numeric" maxLength={1} aria-label={`${spec.op === "add" ? "minnessiffra" : "växling"} kolumn ${idx + 1}`}
                   onChange={(e) => upd({ carries: setIdx(a.carries, idx, e.target.value.replace(/\D/g, "").slice(-1)) })}
                   className="h-8 w-9 rounded-md border border-dashed border-[#e8b64a]/50 bg-transparent text-center text-sm text-[#e8b64a] focus:outline-none focus:ring-1 focus:ring-[#e8b64a]" />
-              ) : <div key={k} className="h-8 w-9" />;
+              ) : <div className="h-8 w-9" />}{slot}</div>;
             })}
           </div>
         </div>
       )}
-      <StaticDigits s={sa} n={cols} />
-      <StaticDigits s={sb} n={cols} sign={sign} />
+      <StaticDigits s={sa} n={cols} dp={dp} />
+      <StaticDigits s={sb} n={cols} sign={sign} dp={dp} />
       <div className="my-1 h-0.5 rounded bg-white/70" />
       {spec.op === "mul" && sb.length > 1 && (
         <div className="space-y-1">
@@ -113,7 +124,7 @@ function ColumnInput({ spec, value, onChange, disabled }: ExProps & { spec: Extr
         </div>
       )}
       <div className="text-right text-[11px] text-[#8d99b3]">Svar</div>
-      <DigitRow n={cols} value={a.result} disabled={disabled} label="svar" onChange={(v) => upd({ result: v })} />
+      <DigitRow n={cols} value={a.result} disabled={disabled} label="svar" dp={dp} onChange={(v) => upd({ result: v })} />
     </div>
   );
 }
@@ -122,7 +133,7 @@ function ColumnInput({ spec, value, onChange, disabled }: ExProps & { spec: Extr
 function NumberLineInput({ spec, value, onChange, disabled }: ExProps & { spec: Extract<ExerciseSpec, { kind: "numberline" }> }) {
   const sel = value?.kind === "numberline" ? value.value : null;
   const n = Math.round((spec.max - spec.min) / spec.step);
-  const fmt = (v: number) => (spec.den ? (v % spec.den === 0 ? String(v / spec.den) : `${v}/${spec.den}`) : sv(v));
+  const fmt = (v: number) => tickLabel(v, spec.den, spec.dp);
   const x = (v: number) => 16 + ((v - spec.min) / (spec.max - spec.min)) * 288;
   const pick = (clientX: number, el: SVGSVGElement) => {
     if (disabled) return;

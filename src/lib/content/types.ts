@@ -43,7 +43,7 @@ export interface Lesson {
   intro: string;
   theory: TheoryBlock[];
   worked: WorkedExample[];
-  drawing: { task: string; tool: "grid" | "numberline" | "fraction" | "fractioncircle" | "area" | "coordinate" | "column" };
+  drawing: { task: string; tool: "grid" | "numberline" | "fraction" | "fractioncircle" | "hundredgrid" | "area" | "coordinate" | "column" };
   pupils: PupilCase[];
   knowledge: Template[]; // gated knowledge test is drawn from these
   method: Template[]; // gated written-method section

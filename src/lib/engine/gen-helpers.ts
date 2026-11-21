@@ -127,11 +127,11 @@ export function columnSolution(op: "add" | "sub" | "mul", a: number, b: number) 
 
 export function columnEx(
   id: string, skill: string, op: "add" | "sub" | "mul", a: number, b: number,
-  explanation: string, hints: string[], prompt?: string,
+  explanation: string, hints: string[], prompt?: string, dp?: number,
 ): ConcreteExercise {
   const sol = columnSolution(op, a, b);
   return {
-    spec: { kind: "column", id, skill, op, a, b, prompt: prompt ?? "Räkna med uppställning och skriv dina mellansteg." },
+    spec: { kind: "column", id, skill, op, a, b, ...(dp ? { dp } : {}), prompt: prompt ?? "Räkna med uppställning och skriv dina mellansteg." },
     solution: { kind: "column", ...sol },
     explanation, hints,
   };
@@ -153,7 +153,7 @@ export function areaEx(
 
 export function numberlineEx(
   id: string, skill: string, prompt: string, value: number,
-  line: { min: number; max: number; step: number; labelEvery: number; format?: "int" | "dec1"; den?: number },
+  line: { min: number; max: number; step: number; labelEvery: number; format?: "int" | "dec1"; den?: number; dp?: number },
   explanation: string, hints: string[],
 ): ConcreteExercise {
   return {
@@ -224,3 +224,25 @@ export function fracAcc(n: number, d: number): string[] {
 }
 /** Label for tick value v on a fraction line whose unit interval has `den` parts. */
 export const fracLabel = (v: number, den: number) => (v % den === 0 ? String(v / den) : `${v}/${den}`);
+
+// ---------- decimals ----------
+/** Format n (an integer count of 10^-dp) with a Swedish decimal comma and exactly dp decimals: dc(435,2) -> "4,35". */
+export function dc(n: number, dp: number): string {
+  const neg = n < 0;
+  const s = String(Math.abs(n)).padStart(dp + 1, "0");
+  const i = s.slice(0, s.length - dp), f = s.slice(s.length - dp);
+  return (neg ? "\u2212" : "") + (dp ? `${i},${f}` : i);
+}
+/** Same, with trailing decimal zeros removed: dcTrim(480,2) -> "4,8", dcTrim(500,2) -> "5". */
+export function dcTrim(n: number, dp: number): string {
+  const t = dc(n, dp);
+  return t.includes(",") ? t.replace(/0+$/, "").replace(/,$/, "") : t;
+}
+/** Accepted typed answers (canonical number compare ignores comma/dot and trailing zeros). */
+export const dcAcc = (n: number, dp: number): string[] => [dcTrim(n, dp).replace(",", ".")];
+/** Tick label on a number line whose ticks are integers: fractions (den), decimals (dp) or plain. */
+export function tickLabel(v: number, den?: number, dp?: number): string {
+  if (den) return fracLabel(v, den);
+  if (dp) return dcTrim(v, dp);
+  return sv(v);
+}
