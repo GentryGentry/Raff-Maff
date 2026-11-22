@@ -4,7 +4,7 @@
 /* Rutat block: ljust papper med marinblått bläck och en gul överstrykningspenna. Mörkt läge följer telefonen. */
 :root {
   --paper: #FBFCFE; --paper2: #EEF2F9; --ink: #14214F; --ink2: #2B3A6B; --muted: #566086; --rule: #D4DDEC;
-  --grid: #E1E8F3; --hl: #FFE27A; --amber: #D79B00; --onhl: #14214F;
+  --grid: #E1E8F3; --hl: #FFE27A; --hl-soft: #FFE27A; --amber: #D79B00; --onhl: #14214F;
   --ok: #1F7A4D; --bad: #C2392B; --fig: #3F5BC9; --fig2: #7C93E8; --fig3: #2A3F9E;
   color-scheme: light;
 }
@@ -12,14 +12,14 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --paper: #10162B; --paper2: #182040; --ink: #E9EDFB; --ink2: #C9D0EA; --muted: #9AA6CD; --rule: #2A3558;
-    --grid: #1A2342; --hl: #F4D35E; --amber: #F4D35E; --onhl: #14214F;
+    --grid: #1A2342; --hl: #F4D35E; --hl-soft: rgba(244, 211, 94, 0.34); --amber: #F4D35E; --onhl: #14214F;
     --ok: #6FD3A5; --bad: #FF7A6B; --fig: #6F8BFF; --fig2: #93A9FF; --fig3: #4F6BE0;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
     --paper: #10162B; --paper2: #182040; --ink: #E9EDFB; --ink2: #C9D0EA; --muted: #9AA6CD; --rule: #2A3558;
-    --grid: #1A2342; --hl: #F4D35E; --amber: #F4D35E; --onhl: #14214F;
+    --grid: #1A2342; --hl: #F4D35E; --hl-soft: rgba(244, 211, 94, 0.34); --amber: #F4D35E; --onhl: #14214F;
     --ok: #6FD3A5; --bad: #FF7A6B; --fig: #6F8BFF; --fig2: #93A9FF; --fig3: #4F6BE0;
     color-scheme: dark;
 }
@@ -57,6 +57,8 @@ h2, h3 { font-weight: 700; }
 [class*="shadow"] { box-shadow: none !important; }
 button, a, input, textarea, select { border-radius: 0; }
 
+/* Överstrykningspenna under en rubrik. I mörkt läge är den genomskinlig så att ljus text förblir läsbar. */
+.mark { background: linear-gradient(transparent 56%, var(--hl-soft) 56% 94%, transparent 94%); padding: 0 2px; }
 .card { background: var(--paper); border: 1.5px solid var(--ink); }
 .on-paper { background: var(--paper); }
 .btn {

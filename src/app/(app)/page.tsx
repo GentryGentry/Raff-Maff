@@ -21,7 +21,7 @@ export default function Home() {
       <header className="safe-top pt-5">
         <div className="uppercase flex items-center justify-between border-b-2 border-ink bg-paper pb-2 text-[10.5px] text-muted"><span>Raff Maff · {profile.display_name}</span><span>{level.rank}</span></div>
         {state.next && (() => { const wi = state.next.lessonId.match(/^w(\d+)/)?.[1]; return wi ? <div className="mt-4 text-[88px] font-extrabold leading-[0.88] tracking-[-0.06em]" aria-hidden>{wi.padStart(2, "0")}</div> : null; })()}
-        <h1 className="text-[30px] font-extrabold leading-[1.05] tracking-tight"><span className="bg-[linear-gradient(transparent_56%,var(--hl)_56%_94%,transparent_94%)] px-0.5">Raff Maff</span></h1>
+        <h1 className="text-[30px] font-extrabold leading-[1.05] tracking-tight"><span className="mark">Raff Maff</span></h1>
       </header>
 
       <section className="card p-5">
