@@ -12,6 +12,9 @@ export const INTERVALS = [1, 3, 7, 14, 30];
 const DAY = 86400_000;
 export const lessonOfSkill = (skill: string) => skill.split(".")[0];
 
+/** Förklaringsuppgifter (lärarutmaning och elevfall) har ingen repetition: de ger inga övningsuppgifter att repetera. */
+export const isRepeatable = (skill: string | undefined | null) => !skill || !/\.(pedagogy|pupil)$/.test(skill);
+
 export function recommend(args: {
   progress: ProgressRow[]; attempts: AttemptRow[]; revision: RevisionItem[]; stats: SkillStat[]; now?: number;
 }): Recommendation[] {
@@ -23,7 +26,7 @@ export function recommend(args: {
     if (!cur || r.priority > cur.priority) out.set(k, r);
   };
   for (const r of args.revision) {
-    if (r.resolved || Date.parse(r.due_at) > now) continue;
+    if (r.resolved || Date.parse(r.due_at) > now || !isRepeatable(r.skill)) continue;
     const overdue = (now - Date.parse(r.due_at)) / DAY;
     add({ lessonId: r.lesson_id, skill: r.skill, reason: `Du har gjort fel här tidigare (${r.times_wrong} gång${r.times_wrong === 1 ? "" : "er"}).`, priority: 50 + r.times_wrong * 5 + Math.min(overdue, 10) });
   }
@@ -32,7 +35,7 @@ export function recommend(args: {
   for (const [lessonId, a] of lastByLesson) {
     if (!a.passed) add({ lessonId, reason: `Senaste kunskapsprovet blev ${Math.round((a.score / a.max_score) * 100)} % – målet är 80 %.`, priority: 70 });
   }
-  for (const s of weakSkills(args.stats)) {
+  for (const s of weakSkills(args.stats).filter((x) => isRepeatable(x.skill))) {
     add({ lessonId: s.lesson_id, skill: s.skill, reason: `Svagt område: ${Math.round((s.wrong / (s.correct + s.wrong)) * 100)} % fel i ${s.correct + s.wrong} försök.`, priority: 60 });
   }
   for (const p of args.progress) {

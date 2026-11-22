@@ -20,18 +20,52 @@ export function canonNum(s: string): string {
   return t.toLowerCase();
 }
 
+/** Gör text jämförbar: gemener, enhetliga räknetecken, utan tusentalsmellanrum och utan mellanrum runt operatorer. */
+function norm(s: string): string {
+  return s
+    .toLowerCase()
+    .replace(/[\u00a0\u202f]/g, " ")
+    .replace(/[\u2212\u2013\u2014]/g, "-")
+    .replace(/(\d) (?=\d{3}(?!\d))/g, "$1")
+    .replace(/[×*]/g, "·")
+    .replace(/(\d)\s*x\s*(?=\d)/g, "$1·")
+    .replace(/\s*([·+\-÷/=])\s*/g, "$1")
+    .replace(/\s+/g, " ");
+}
+
+/** Räknar ett nyckelord som träffat om det står i texten, med böjning (stam), andra skrivsätt för tal och räknetecken. */
+function keywordHit(textN: string, words: string[], kw: string): boolean {
+  const k = norm(kw);
+  if (textN.includes(k) || textN.replace(/\s/g, "").includes(k.replace(/\s/g, ""))) return true;
+  if (/^\p{L}{6,}$/u.test(k)) {
+    const stem = k.slice(0, Math.max(5, k.length - 2));
+    return words.some((w) => w.startsWith(stem));
+  }
+  return false;
+}
+
+/**
+ * Bedömer en förklaring mot en rubrik. Rättningen är medvetet generös: det räcker att täcka de flesta av de viktiga idéerna
+ * (en färre än rubrikens krav), böjningar och olika skrivsätt godkänns, och minimilängden är 65 % av den angivna.
+ * Skydd mot nyckelordsfyllning och kända missuppfattningar gäller fortfarande.
+ */
 export function gradeRubric(text: string, rubric: Rubric, minChars: number) {
   const lower = text.toLowerCase();
+  const textN = norm(text);
   const words = lower.split(/[^\p{L}\p{N}]+/u).filter(Boolean);
   const uniq = new Set(words);
-  const hits = rubric.concepts.filter((c) => c.any.some((k) => lower.includes(k.toLowerCase())));
+  const hits = rubric.concepts.filter((c) => c.any.some((k) => keywordHit(textN, words, k)));
   const missing = rubric.concepts.filter((c) => !hits.includes(c));
   const flagged = (rubric.misconceptions ?? []).filter((m) => new RegExp(m.pattern, "i").test(lower));
-  const tooShort = text.trim().length < minChars;
+  const need = Math.min(rubric.concepts.length, Math.max(2, rubric.minConcepts - 1));
+  const minLen = Math.round(minChars * 0.65);
+  const tooShort = text.trim().length < minLen;
   const stuffed = words.length > 12 && uniq.size / words.length < 0.45;
-  const enough = hits.length >= rubric.minConcepts;
-  const pass = enough && flagged.length === 0 && !tooShort && !stuffed;
-  return { pass, hits, missing, flagged, tooShort, stuffed };
+  const enough = hits.length >= need;
+  const pass = !rubric.aiOnly && enough && flagged.length === 0 && !tooShort && !stuffed;
+  /** Räcker för att en AI-bedömning ska få avgöra: ingen känd missuppfattning, inte för kort, inte fyllning, minst två idéer (elevfall behöver inga nyckelord). */
+  const guardsOk = flagged.length === 0 && !tooShort && !stuffed && (!!rubric.aiOnly || hits.length >= Math.min(2, rubric.concepts.length));
+  return { pass, hits, missing, flagged, tooShort, stuffed, need, minLen, guardsOk };
 }
 
 function expectedAnswerText(sol: Solution, spec: ConcreteExercise["spec"]): string {
@@ -182,10 +216,10 @@ export function gradeExercise(ex: ConcreteExercise, ans: Answer | undefined): It
       let feedback = "Din förklaring täcker de viktiga delarna.";
       if (!g.pass) {
         const parts: string[] = [];
-        if (g.tooShort) parts.push(`Förklaringen är för kort (minst ${minChars} tecken).`);
+        if (g.tooShort) parts.push(`Förklaringen är för kort (minst ${g.minLen} tecken).`);
         if (g.stuffed) parts.push("Förklaringen upprepar samma ord – skriv med egna meningar.");
         if (g.flagged.length) parts.push(...g.flagged.map((f) => f.message));
-        if (g.hits.length < sol.rubric.minConcepts)
+        if (g.hits.length < g.need)
           parts.push(`Förklaringen saknar: ${g.missing.map((m) => m.label).join("; ")}.`);
         feedback = parts.join(" ");
       }

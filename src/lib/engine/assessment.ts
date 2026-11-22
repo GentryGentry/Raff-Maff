@@ -38,6 +38,21 @@ export function teacherExercise(lesson: Lesson, seed: string): ConcreteExercise 
   return textTask(`teacher-${lesson.id}`, `${lesson.id}.pedagogy`, t.prompt, scenario, t.minChars, t.rubric, t.modelAnswer);
 }
 
+/** Variant 0 är lärarutmaningen i lektionen. Variant k (k ≥ 1) är elevfall nummer k ur lektionen, bedömt av AI. */
+export const academyVariants = (lesson: Lesson, withAi: boolean) => 1 + (withAi ? lesson.pupils.length : 0);
+export const variantOf = (seed: string) => Number(/~v(\d+)$/.exec(seed)?.[1] ?? 0);
+
+export function pupilExercise(lesson: Lesson, index: number, seed: string): ConcreteExercise {
+  const p = lesson.pupils[index];
+  return textTask(
+    `pupil-${lesson.id}-${index}`, `${lesson.id}.pupil`,
+    "Hur svarar du eleven? Förklara vad som inte stämmer och hjälp eleven vidare, gärna med ett konkret exempel eller en modell.",
+    `${p.pupil} (åk 4–6) säger: ”${p.said}”`, 120,
+    { aiOnly: true, minConcepts: 2, concepts: [{ id: "miss", label: `Visar vad eleven har missförstått (${p.misconception})`, any: [] }, { id: "help", label: "Ger en korrekt förklaring eller ett konkret sätt att hjälpa eleven vidare", any: [] }] },
+    p.response,
+  );
+}
+
 export function generateAssessment(
   lessonId: string,
   kind: AssessmentKind,
@@ -62,7 +77,10 @@ export function generateAssessment(
     case "method": return build(lesson.method, SECTION_SIZE.method, seed, 1);
     case "representation": return build(lesson.representation, SECTION_SIZE.representation, seed, 1);
     case "pedagogy": return [teacherExercise(lesson, seed)];
-    case "academy": return [teacherExercise(lesson, seed)];
+    case "academy": {
+      const v = variantOf(seed);
+      return [v >= 1 && lesson.pupils[v - 1] ? pupilExercise(lesson, v - 1, seed) : teacherExercise(lesson, seed)];
+    }
   }
 }
 

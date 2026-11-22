@@ -67,6 +67,6 @@ export function pedagogySummary(attempts: AttemptRow[]) {
 
 export function weakSkills(stats: SkillStat[], min = 4, threshold = 0.35) {
   return stats
-    .filter((s) => s.correct + s.wrong >= min && s.wrong / (s.correct + s.wrong) > threshold)
+    .filter((s) => !/\.(pedagogy|pupil)$/.test(s.skill) && s.correct + s.wrong >= min && s.wrong / (s.correct + s.wrong) > threshold)
     .sort((a, b) => b.wrong / (b.correct + b.wrong) - a.wrong / (a.correct + a.wrong));
 }
