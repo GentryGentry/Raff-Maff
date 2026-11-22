@@ -9,6 +9,7 @@ import { levelInfo, nextStreak, stockholmDate, XP } from "@/lib/engine/xp";
 import type { Answer, ConcreteExercise, ItemResult, Section } from "@/lib/engine/types";
 import { SECTIONS } from "@/lib/engine/types";
 import { reviewExplanation } from "./ai";
+import { gradeRubric } from "@/lib/engine/grading";
 import { HttpError } from "./auth";
 import { signToken, verifyToken } from "./token";
 import type { AttemptRow, Profile, ProgressRow, Store } from "./types";
@@ -170,16 +171,26 @@ export async function submitAssessment(store: Store, userId: string, token: stri
   if (!exercises.length) throw new HttpError(400, "Provet kunde inte återskapas.");
   const graded = gradeSet(kind, exercises, answers.slice(0, exercises.length));
 
-  // Optional AI review of teacher explanations: may only turn a pass into a fail.
+  // Lärarförklaringar: regelverket är generöst och, när AI finns, avgör AI om en förklaring som klarat grundskydden är korrekt.
+  // AI kan alltså godkänna en förklaring med egna ord som regelverket missade, och underkänna en som har fel.
   let aiFeedback: string | undefined;
   if (kind === "pedagogy" || kind === "academy") {
     const ex = exercises[0];
     const item = graded.items[0];
-    if (item.correct && ex.solution.kind === "text" && ex.spec.kind === "text") {
-      const review = await reviewExplanation({ scenario: ex.spec.scenario ?? "", prompt: ex.spec.prompt, answer: (answers[0] as { value?: string })?.value ?? "", modelAnswer: ex.solution.modelAnswer });
+    if (ex.solution.kind === "text" && ex.spec.kind === "text") {
+      const text = (answers[0] as { value?: string })?.value ?? "";
+      const g = gradeRubric(text, ex.solution.rubric, ex.spec.minChars);
+      const review = g.guardsOk ? await reviewExplanation({ scenario: ex.spec.scenario ?? "", prompt: ex.spec.prompt, answer: text, modelAnswer: ex.solution.modelAnswer, concepts: ex.solution.rubric.concepts.map((c) => c.label) }) : null;
       if (review) {
         aiFeedback = review.feedback;
-        if (!review.ok) { item.correct = false; item.points = 0; item.feedback = "AI-granskningen hittade matematiska eller pedagogiska brister: " + review.feedback; graded.points = 0; graded.ratio = 0; graded.passed = false; }
+        if (review.ok && !item.correct) {
+          item.correct = true; item.points = item.max; item.feedback = "Godkänd. " + review.feedback;
+          graded.points = graded.max; graded.ratio = 1; graded.passed = true;
+        } else if (!review.ok && item.correct) {
+          item.correct = false; item.points = 0; item.feedback = "AI-granskningen hittade brister: " + review.feedback; graded.points = 0; graded.ratio = 0; graded.passed = false;
+        } else if (!review.ok) {
+          item.feedback = item.feedback + " " + review.feedback;
+        }
       }
     }
   }
