@@ -19,7 +19,7 @@ export function Feedback({ result, explanation }: { result: ItemResult; explanat
     <div className={`fade-in rounded-xl border p-4 ${ok ? "border-ok/50 bg-ok/10" : partial ? "border-ink/50 bg-hl/10" : "border-bad/50 bg-bad/10"}`} role="status">
       <div className={`font-semibold ${ok ? "text-ok" : partial ? "text-ink" : "text-bad"}`}>{ok ? "✓ " : partial ? "◐ " : "✗ "}{result.feedback}</div>
       {!ok && result.correctAnswerText && result.kind !== "text" && <div className="mt-2 text-sm text-ink2">Rätt svar: <strong>{result.correctAnswerText}</strong></div>}
-      {!ok && result.kind === "text" && result.correctAnswerText && <div className="mt-3 text-sm"><div className="mb-1 font-semibold text-ink2">Exempel på en bra förklaring:</div><Rich text={result.correctAnswerText} /></div>}
+      {ok && result.kind === "text" && result.correctAnswerText && <div className="mt-3 text-sm"><div className="mb-1 font-semibold text-ink2">Exempel att jämföra med:</div><Rich text={result.correctAnswerText} /></div>}
       {explanation && result.kind !== "text" && <div className="mt-2 border-t border-rule pt-2 text-sm"><div className="mb-1 font-semibold text-ink2">Varför?</div><Rich text={explanation} /></div>}
     </div>
   );
@@ -165,7 +165,7 @@ export function AssessmentRunner({ lessonId, kind, title, onClose, startLabel, a
           <div className="mt-1 text-xl font-bold">{res.passed ? "Godkänt!" : "Inte godkänt än"}</div>
           <div className="text-muted">{res.kind === "pedagogy" || res.kind === "academy" ? "Din förklaring bedömdes mot kriterierna." : `${Math.round(res.points * 10) / 10} av ${res.max} poäng · ${pct} % (krav ${Math.round(res.threshold * 100)} %)`}</div>
           {res.xp > 0 && <div className="mt-2"><Pill tone="gold">+{res.xp} XP</Pill></div>}
-          {!res.passed && <p className="mt-3 text-sm text-ink2">Ingen fara – du får nya tal vid nästa försök. Gå igenom felen nedan och öva riktat innan du försöker igen.</p>}
+          {!res.passed && <p className="mt-3 text-sm text-ink2">{res.kind === "pedagogy" || res.kind === "academy" ? "Ingen fara. Läs återkopplingen, skriv om förklaringen med egna ord och försök igen. Exempelsvaret visas när du blivit godkänd." : "Ingen fara – du får nya tal vid nästa försök. Gå igenom felen nedan och öva riktat innan du försöker igen."}</p>}
           {res.aiFeedback && <p className="mt-3 text-left text-sm text-ink2"><strong>AI-återkoppling:</strong> {res.aiFeedback}</p>}
         </div>
         <div className="space-y-3">
@@ -177,14 +177,14 @@ export function AssessmentRunner({ lessonId, kind, title, onClose, startLabel, a
             </div>
           ))}
         </div>
-        {!res.passed && weak.length > 0 && (
+        {!res.passed && weak.length > 0 && res.kind !== "pedagogy" && res.kind !== "academy" && (
           <div className="card p-4"><div className="mb-2 font-semibold">Öva riktat på:</div>
             <div className="flex flex-wrap gap-2">{weak.map((w) => <Pill key={w} tone="red">{w.split(".")[1] ?? w}</Pill>)}</div>
             {getLesson(lessonId) && <Link className="btn btn-ghost mt-3 w-full" href={`/lektion/${lessonId}?steg=6`}>Gå till guidad träning</Link>}
           </div>
         )}
         <div className="flex gap-2">
-          {!res.passed && <button className="btn btn-gold flex-1" onClick={() => { setRes(null); setPhase("idle"); setTimeout(start, 0); }}>Försök igen (nya tal)</button>}
+          {!res.passed && <button className="btn btn-gold flex-1" onClick={() => { setRes(null); setPhase("idle"); setTimeout(start, 0); }}>{res.kind === "pedagogy" || res.kind === "academy" ? "Försök igen" : "Försök igen (nya tal)"}</button>}
           <button className="btn btn-ghost flex-1" onClick={() => onClose?.(res)}>Klar</button>
         </div>
       </div>

@@ -62,9 +62,9 @@ export function gradeRubric(text: string, rubric: Rubric, minChars: number) {
   const tooShort = text.trim().length < minLen;
   const stuffed = words.length > 12 && uniq.size / words.length < 0.45;
   const enough = hits.length >= need;
-  const pass = enough && flagged.length === 0 && !tooShort && !stuffed;
-  /** Räcker för att en AI-bedömning ska få avgöra: ingen känd missuppfattning, inte för kort, inte fyllning, minst två idéer. */
-  const guardsOk = flagged.length === 0 && !tooShort && !stuffed && hits.length >= Math.min(2, rubric.concepts.length);
+  const pass = !rubric.aiOnly && enough && flagged.length === 0 && !tooShort && !stuffed;
+  /** Räcker för att en AI-bedömning ska få avgöra: ingen känd missuppfattning, inte för kort, inte fyllning, minst två idéer (elevfall behöver inga nyckelord). */
+  const guardsOk = flagged.length === 0 && !tooShort && !stuffed && (!!rubric.aiOnly || hits.length >= Math.min(2, rubric.concepts.length));
   return { pass, hits, missing, flagged, tooShort, stuffed, need, minLen, guardsOk };
 }
 

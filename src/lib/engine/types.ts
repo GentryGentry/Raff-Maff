@@ -118,6 +118,8 @@ export interface Rubric {
   minConcepts: number;
   /** Phrases that signal a known misconception; each one fails the answer. */
   misconceptions?: { pattern: string; message: string }[];
+  /** Kan bara godkännas av AI-bedömning (fritt elevfall utan nyckelord). Utan AI erbjuds uppgiften inte. */
+  aiOnly?: boolean;
 }
 
 export interface ConcreteExercise {

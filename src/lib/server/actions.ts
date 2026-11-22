@@ -1,15 +1,16 @@
 import { ALL_LESSONS, BUILT_WORLDS, bossId, bossWorldId, getLesson, getWorld, isBossId } from "@/lib/content";
 import { ACHIEVEMENTS, newlyEarned, publicAchievements, type AchCtx } from "@/lib/engine/achievements";
-import { generateAssessment, gradeSet, knownLessonId, PASS_THRESHOLD, type AssessmentKind } from "@/lib/engine/assessment";
+import { academyVariants, generateAssessment, gradeSet, knownLessonId, PASS_THRESHOLD, variantOf, type AssessmentKind } from "@/lib/engine/assessment";
 import { lessonMastery, overallCompletion, pedagogySummary, weakSkills, worldMastery } from "@/lib/engine/mastery";
 import { randomSeed } from "@/lib/engine/rng";
-import { lessonOfSkill, recommend, updateRevision } from "@/lib/engine/revision";
+import { isRepeatable, lessonOfSkill, recommend, updateRevision } from "@/lib/engine/revision";
 import { bossUnlocked, lessonUnlocked, nextLesson, worldUnlocked, type ProgressMap } from "@/lib/engine/unlock";
 import { levelInfo, nextStreak, stockholmDate, XP } from "@/lib/engine/xp";
 import type { Answer, ConcreteExercise, ItemResult, Section } from "@/lib/engine/types";
 import { SECTIONS } from "@/lib/engine/types";
 import { reviewExplanation } from "./ai";
 import { gradeRubric } from "@/lib/engine/grading";
+import { aiConfigured } from "./config";
 import { HttpError } from "./auth";
 import { signToken, verifyToken } from "./token";
 import type { AttemptRow, Profile, ProgressRow, Store } from "./types";
@@ -115,7 +116,7 @@ async function applySkillResults(store: Store, userId: string, items: { skill: s
   const rMap = new Map(revision.map((r) => [`${r.lesson_id}|${r.skill}`, r]));
   const changedR = new Map<string, NonNullable<ReturnType<typeof updateRevision>>>();
   const now = nowIso();
-  for (const it of items) {
+  for (const it of items.filter((i) => isRepeatable(i.skill))) {
     const s = sMap.get(it.skill) ?? { user_id: userId, skill: it.skill, lesson_id: lessonOfSkill(it.skill), correct: 0, wrong: 0, last_practiced: now };
     if (it.correct) s.correct++; else s.wrong++;
     s.last_practiced = now; sMap.set(it.skill, s);
@@ -143,7 +144,7 @@ export async function startAssessment(store: Store, userId: string, lessonId: st
       if (r.skill) skills.push(r.skill);
       else { const l = getLesson(r.lessonId); if (l) skills.push(...[...l.knowledge, ...l.method].map((t) => t.skill)); }
     }
-    skills = [...new Set(skills)];
+    skills = [...new Set(skills)].filter(isRepeatable);
     lid = recs[0].lessonId;
   } else {
     if (!knownLessonId(lessonId)) throw new HttpError(404, "Okänd lektion.");
@@ -156,11 +157,25 @@ export async function startAssessment(store: Store, userId: string, lessonId: st
       if (!map[lessonId]?.theory_done) throw new HttpError(403, "Läs igenom lektionen innan du gör provet.");
     }
   }
-  const seed = randomSeed();
+  let seed = randomSeed();
+  if (kind === "academy") {
+    // Variera övningen: lärarutmaningen och (med AI) elevfallen från lektionen, aldrig samma som förra gången.
+    const l = getLesson(lid);
+    const n = l ? academyVariants(l, aiConfigured()) : 1;
+    const last = attempts.filter((a) => a.section === "academy" && a.lesson_id === lid).sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
+    const options = Array.from({ length: n }, (_, i) => i).filter((i) => n === 1 || !last || i !== variantOf(last.seed));
+    seed += `~v${options[Math.floor(Math.random() * options.length)]}`;
+  }
   const { token } = signToken({ u: userId, l: lid, k: kind, s: seed, sk: skills });
   const exercises = generateAssessment(lid, kind, seed, { skills });
-  if (!exercises.length) throw new HttpError(404, "Inga uppgifter hittades.");
+  if (!exercises.length) throw new HttpError(kind === "revision" ? 409 : 404, kind === "revision" ? "Inget att repetera just nu." : "Inga uppgifter hittades.");
   return { token, kind, lessonId: lid, threshold: PASS_THRESHOLD[kind], exercises: exercises.map((e) => e.spec) };
+}
+
+/** Facit för förklaringar visas först när man blivit godkänd, så att det inte går att kopiera ett exempelsvar efter ett underkänt försök. */
+export function publicItem(it: ItemResult, ex: ConcreteExercise) {
+  const isText = ex.solution.kind === "text";
+  return { ...it, explanation: isText && !it.correct ? "" : ex.explanation, correctAnswerText: isText ? (it.correct ? (ex.solution as { modelAnswer: string }).modelAnswer : undefined) : it.correctAnswerText };
 }
 
 export async function submitAssessment(store: Store, userId: string, token: string, answers: (Answer | undefined)[]) {
@@ -181,6 +196,7 @@ export async function submitAssessment(store: Store, userId: string, token: stri
       const text = (answers[0] as { value?: string })?.value ?? "";
       const g = gradeRubric(text, ex.solution.rubric, ex.spec.minChars);
       const review = g.guardsOk ? await reviewExplanation({ scenario: ex.spec.scenario ?? "", prompt: ex.spec.prompt, answer: text, modelAnswer: ex.solution.modelAnswer, concepts: ex.solution.rubric.concepts.map((c) => c.label) }) : null;
+      if (ex.solution.rubric.aiOnly && g.guardsOk && !review) throw new HttpError(502, "AI-bedömningen svarade inte just nu. Försök skicka igen om en stund.");
       if (review) {
         aiFeedback = review.feedback;
         if (review.ok && !item.correct) {
@@ -239,7 +255,8 @@ export async function submitAssessment(store: Store, userId: string, token: stri
   await applySkillResults(store, userId, graded.items.map((i) => ({ skill: i.skill, correct: i.correct })), stats, revision);
   const newAchievements = await grantAchievements(store, userId, profile);
 
-  const strip = (it: ItemResult, ex: ConcreteExercise) => ({ ...it, explanation: ex.explanation, ...(ex.solution.kind === "text" ? { correctAnswerText: ex.solution.modelAnswer } : {}) });
+  const strip = publicItem;
+
   return {
     kind, lessonId: p.l, passed: graded.passed, points: graded.points, max: graded.max, ratio: graded.ratio,
     threshold: PASS_THRESHOLD[kind], xp, lessonCompleted, bossPassed, aiFeedback,
