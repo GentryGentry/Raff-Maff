@@ -55,20 +55,20 @@ export default function Tutor() {
     <div className="flex min-h-[calc(100dvh-7rem)] flex-col pb-4">
       <PageHeader title="AI-handledare" subtitle="Raff hjälper dig förstå – men kan inte låsa upp nivåer." back={{ href: "/profil", label: "Profil" }} />
       <div className="flex-1 space-y-3 px-5">
-        {config && !config.ai && <div className="card border-[#e8b64a]/40 p-4 text-sm text-[#f3d58a]">AI-handledaren är inte aktiverad på servern (OPENAI_API_KEY saknas). Du kan fortfarande få nya övningar nedan.</div>}
-        <label className="block text-sm text-[#8d99b3]">Lektion
+        {config && !config.ai && <div className="card border-ink/40 p-4 text-sm text-ink">AI-handledaren är inte aktiverad på servern (OPENAI_API_KEY saknas). Du kan fortfarande få nya övningar nedan.</div>}
+        <label className="block text-sm text-muted">Lektion
           <select className="field mt-1" value={lessonId ?? ""} onChange={(e) => setLessonId(e.target.value || undefined)}><option value="">Ingen vald</option>{lessons.map((id) => <option key={id} value={id}>{getLesson(id)?.title}</option>)}</select></label>
-        <div className="flex gap-2 overflow-x-auto pb-1">{quick.map((q) => <button key={q} className="shrink-0 rounded-full bg-[#182848] px-3.5 py-2 text-sm" onClick={() => send(q)}>{q}</button>)}<button className="shrink-0 rounded-full bg-[#e8b64a] px-3.5 py-2 text-sm font-semibold text-black" onClick={newExercise}>🎲 Ny övning</button></div>
-        {msgs.map((m, i) => <div key={i} className={`max-w-[92%] rounded-2xl px-4 py-3 ${m.role === "user" ? "ml-auto bg-[#e8b64a]/20" : "card"}`}><Rich text={m.content} /></div>)}
+        <div className="flex gap-2 overflow-x-auto pb-1">{quick.map((q) => <button key={q} className="shrink-0 rounded-full bg-paper2 px-3.5 py-2 text-sm" onClick={() => send(q)}>{q}</button>)}<button className="shrink-0 rounded-full bg-hl px-3.5 py-2 text-sm font-semibold text-onhl" onClick={newExercise}>Ny övning</button></div>
+        {msgs.map((m, i) => <div key={i} className={`max-w-[92%] rounded-2xl px-4 py-3 ${m.role === "user" ? "ml-auto bg-hl/20" : "card"}`}><Rich text={m.content} /></div>)}
         {ex && (
-          <div className="card space-y-3 p-5"><div className="text-xs font-semibold uppercase text-[#e8b64a]">Ny övning</div>
+          <div className="card space-y-3 p-5"><div className="text-xs font-semibold uppercase text-ink">Ny övning</div>
             <ExerciseView key={ex.spec.id} spec={ex.spec} value={ans ?? emptyAnswer(ex.spec)} onChange={setAns} disabled={!!res} />
             {res ? <><Feedback result={res} explanation={ex.explanation} /><button className="btn btn-ghost w-full" onClick={newExercise}>Nästa övning</button><button className="btn btn-ghost w-full" onClick={() => send(`Jag svarade fel på: "${ex.spec.prompt}". Förklara min missuppfattning utan att bara ge svaret.`)}>Förklara mitt fel</button></>
               : <button className="btn btn-gold w-full" disabled={!isAnswered(ex.spec, ans)} onClick={() => setRes(gradeExercise(ex, ans))}>Kontrollera</button>}
           </div>
         )}
         {busy && <Spinner label="Raff tänker …" />}
-        {err && <div className="rounded-xl border border-[#ef6a6a]/40 bg-[#ef6a6a]/10 p-3 text-sm text-[#ef6a6a]">{err}</div>}
+        {err && <div className="rounded-xl border border-bad/40 bg-bad/10 p-3 text-sm text-bad">{err}</div>}
         <div ref={end} />
       </div>
       <form className="safe-bottom sticky bottom-20 mx-5 mt-3 flex gap-2" onSubmit={(e) => { e.preventDefault(); void send(input); }}>

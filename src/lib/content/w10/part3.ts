@@ -223,7 +223,7 @@ export const lesson9: Lesson = {
     { id: "solidCount", skill: "w10-l9.parts-visual", gen: (rng) => { const s = rng.pick(FLAT_SOLIDS), p = rng.pick([["sidoytor", "faces"], ["hörn", "verts"], ["kanter", "edges"]] as const);
       return withVisual(numeric(`sc-${s.name}-${p[1]}`, "w10-l9.parts-visual", `Hur många ${p[0]} har kroppen på bilden? (Streckade linjer är kanter som är dolda bakom.)`, s[p[1]], `Kroppen är en ${s.name}: ${s.faces} sidoytor, ${s.edges} kanter, ${s.verts} hörn.`, ["Tänk på de dolda ytorna och hörnen på baksidan."]), { type: "solid", shape: s.shape }); } },
     { id: "circleParts", skill: "w10-l9.circle-visual", gen: (rng) => { const line = rng.pick(["radius", "diameter"] as const); const a = line === "radius" ? "radie" : "diameter";
-      return withVisual(mc(`cv-${line}`, "w10-l9.circle-visual", "Vad kallas den gula linjen i cirkeln?", a, ["radie", "diameter", "omkrets", "mittpunkt"].filter((x) => x !== a).map((text) => ({ text })), a === "radie" ? "Den går från mittpunkten till cirkeln: radie." : "Den går genom mittpunkten från kant till kant: diameter.", ["Går linjen genom hela cirkeln eller bara till mitten?"], rng), { type: "circle", line }); } },
+      return withVisual(mc(`cv-${line}`, "w10-l9.circle-visual", "Vad kallas den markerade linjen i cirkeln?", a, ["radie", "diameter", "omkrets", "mittpunkt"].filter((x) => x !== a).map((text) => ({ text })), a === "radie" ? "Den går från mittpunkten till cirkeln: radie." : "Den går genom mittpunkten från kant till kant: diameter.", ["Går linjen genom hela cirkeln eller bara till mitten?"], rng), { type: "circle", line }); } },
   ],
   teacher: {
     title: "Kub eller kvadrat?",

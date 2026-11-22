@@ -16,11 +16,11 @@ export function Feedback({ result, explanation }: { result: ItemResult; explanat
   const ok = result.correct;
   const partial = !ok && result.points > 0;
   return (
-    <div className={`fade-in rounded-xl border p-4 ${ok ? "border-[#3ecf8e]/50 bg-[#3ecf8e]/10" : partial ? "border-[#e8b64a]/50 bg-[#e8b64a]/10" : "border-[#ef6a6a]/50 bg-[#ef6a6a]/10"}`} role="status">
-      <div className={`font-semibold ${ok ? "text-[#3ecf8e]" : partial ? "text-[#f3d58a]" : "text-[#ef6a6a]"}`}>{ok ? "✓ " : partial ? "◐ " : "✗ "}{result.feedback}</div>
-      {!ok && result.correctAnswerText && result.kind !== "text" && <div className="mt-2 text-sm text-[#c3cce0]">Rätt svar: <strong>{result.correctAnswerText}</strong></div>}
-      {!ok && result.kind === "text" && result.correctAnswerText && <div className="mt-3 text-sm"><div className="mb-1 font-semibold text-[#c3cce0]">Exempel på en bra förklaring:</div><Rich text={result.correctAnswerText} /></div>}
-      {explanation && result.kind !== "text" && <div className="mt-2 border-t border-white/10 pt-2 text-sm"><div className="mb-1 font-semibold text-[#c3cce0]">Varför?</div><Rich text={explanation} /></div>}
+    <div className={`fade-in rounded-xl border p-4 ${ok ? "border-ok/50 bg-ok/10" : partial ? "border-ink/50 bg-hl/10" : "border-bad/50 bg-bad/10"}`} role="status">
+      <div className={`font-semibold ${ok ? "text-ok" : partial ? "text-ink" : "text-bad"}`}>{ok ? "✓ " : partial ? "◐ " : "✗ "}{result.feedback}</div>
+      {!ok && result.correctAnswerText && result.kind !== "text" && <div className="mt-2 text-sm text-ink2">Rätt svar: <strong>{result.correctAnswerText}</strong></div>}
+      {!ok && result.kind === "text" && result.correctAnswerText && <div className="mt-3 text-sm"><div className="mb-1 font-semibold text-ink2">Exempel på en bra förklaring:</div><Rich text={result.correctAnswerText} /></div>}
+      {explanation && result.kind !== "text" && <div className="mt-2 border-t border-rule pt-2 text-sm"><div className="mb-1 font-semibold text-ink2">Varför?</div><Rich text={explanation} /></div>}
     </div>
   );
 }
@@ -56,10 +56,10 @@ export function PracticeRunner({ lesson, mode, count, onFinished }: { lesson: Le
     const right = log.filter((l) => l.correct).length;
     return (
       <div className="card fade-in space-y-3 p-5 text-center">
-        <div className="text-4xl">{right === log.length ? "🌟" : "👍"}</div>
+        
         <div className="text-lg font-semibold">{right} av {log.length} rätt</div>
         {gained !== null && gained > 0 && <Pill tone="gold">+{gained} XP</Pill>}
-        <p className="text-sm text-[#8d99b3]">Nya siffror varje gång – öva så många omgångar du vill.</p>
+        <p className="text-sm text-muted">Nya siffror varje gång – öva så många omgångar du vill.</p>
         <div className="flex justify-center gap-2"><button className="btn btn-ghost" onClick={() => setRound((r) => r + 1)}>Ny omgång</button>{onFinished && <button className="btn btn-gold" onClick={onFinished}>Fortsätt</button>}</div>
       </div>
     );
@@ -82,12 +82,12 @@ export function PracticeRunner({ lesson, mode, count, onFinished }: { lesson: Le
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-3"><Bar value={(i + (result ? 1 : 0)) / exs.length} /><span className="whitespace-nowrap text-sm text-[#8d99b3]">{i + 1}/{exs.length}</span></div>
+      <div className="flex items-center gap-3"><Bar value={(i + (result ? 1 : 0)) / exs.length} /><span className="whitespace-nowrap text-sm text-muted">{i + 1}/{exs.length}</span></div>
       <div className="card space-y-4 p-5">
         <ExerciseView key={`${round}-${i}`} spec={ex.spec} value={answer ?? emptyAnswer(ex.spec)} onChange={setAnswer} disabled={!!result} />
         {mode === "guided" && !result && ex.hints.length > 0 && (
           <div className="space-y-2">
-            {ex.hints.slice(0, hints).map((h, k) => <div key={k} className="rounded-lg bg-[#182848] p-3 text-sm"><span className="mr-1">💡</span><Rich text={h} className="inline" /></div>)}
+            {ex.hints.slice(0, hints).map((h, k) => <div key={k} className="rounded-lg bg-paper2 p-3 text-sm"><span className="mr-1"></span><Rich text={h} className="inline" /></div>)}
             {hints < ex.hints.length && <button className="btn btn-ghost min-h-[40px] text-sm" onClick={() => setHints(hints + 1)}>Ge mig en ledtråd ({hints}/{ex.hints.length})</button>}
           </div>
         )}
@@ -134,8 +134,8 @@ export function AssessmentRunner({ lessonId, kind, title, onClose, startLabel, a
       const r = await api<Submitted>("/api/assessment/submit", { token: started.token, answers });
       setRes(r); setPhase("result");
       r.newAchievements.forEach((a) => pushToast({ icon: a.icon, title: `Märke: ${a.title}`, text: a.description }));
-      if (r.lessonCompleted) pushToast({ icon: "🎓", title: "Lektionen är klar!", text: "Nästa lektion är upplåst." });
-      if (r.bossPassed) pushToast({ icon: "🏆", title: "Bossutmaningen besegrad!", text: "Nästa värld är upplåst." });
+      if (r.lessonCompleted) pushToast({ icon: "", title: "Lektionen är klar!", text: "Nästa lektion är upplåst." });
+      if (r.bossPassed) pushToast({ icon: "", title: "Bossutmaningen besegrad!", text: "Nästa värld är upplåst." });
       void refresh();
     } catch (e) { setError(e instanceof ApiError ? e.message : "Kunde inte lämna in."); setPhase("running"); }
   };
@@ -148,7 +148,7 @@ export function AssessmentRunner({ lessonId, kind, title, onClose, startLabel, a
   if (phase === "idle" || phase === "loading") {
     return (
       <div className="space-y-3">
-        {error && <div className="rounded-xl border border-[#ef6a6a]/40 bg-[#ef6a6a]/10 p-3 text-sm text-[#ef6a6a]">{error}</div>}
+        {error && <div className="rounded-xl border border-bad/40 bg-bad/10 p-3 text-sm text-bad">{error}</div>}
         <button className="btn btn-gold w-full" disabled={phase === "loading"} onClick={start}>{phase === "loading" ? "Förbereder …" : startLabel ?? `Starta: ${title}`}</button>
       </div>
     );
@@ -160,18 +160,18 @@ export function AssessmentRunner({ lessonId, kind, title, onClose, startLabel, a
     const weak = [...new Set(res.items.filter((x) => !x.correct).map((x) => x.skill))];
     return (
       <div className="space-y-4">
-        <div className={`card pop p-5 text-center ${res.passed ? "border-[#3ecf8e]/50" : "border-[#ef6a6a]/40"}`}>
-          <div className="text-4xl">{res.passed ? "🎉" : "💪"}</div>
+        <div className={`card pop p-5 text-center ${res.passed ? "border-ok/50" : "border-bad/40"}`}>
+          
           <div className="mt-1 text-xl font-bold">{res.passed ? "Godkänt!" : "Inte godkänt än"}</div>
-          <div className="text-[#8d99b3]">{res.kind === "pedagogy" || res.kind === "academy" ? "Din förklaring bedömdes mot kriterierna." : `${Math.round(res.points * 10) / 10} av ${res.max} poäng · ${pct} % (krav ${Math.round(res.threshold * 100)} %)`}</div>
+          <div className="text-muted">{res.kind === "pedagogy" || res.kind === "academy" ? "Din förklaring bedömdes mot kriterierna." : `${Math.round(res.points * 10) / 10} av ${res.max} poäng · ${pct} % (krav ${Math.round(res.threshold * 100)} %)`}</div>
           {res.xp > 0 && <div className="mt-2"><Pill tone="gold">+{res.xp} XP</Pill></div>}
-          {!res.passed && <p className="mt-3 text-sm text-[#c3cce0]">Ingen fara – du får nya tal vid nästa försök. Gå igenom felen nedan och öva riktat innan du försöker igen.</p>}
-          {res.aiFeedback && <p className="mt-3 text-left text-sm text-[#c3cce0]"><strong>AI-återkoppling:</strong> {res.aiFeedback}</p>}
+          {!res.passed && <p className="mt-3 text-sm text-ink2">Ingen fara – du får nya tal vid nästa försök. Gå igenom felen nedan och öva riktat innan du försöker igen.</p>}
+          {res.aiFeedback && <p className="mt-3 text-left text-sm text-ink2"><strong>AI-återkoppling:</strong> {res.aiFeedback}</p>}
         </div>
         <div className="space-y-3">
           {res.items.map((it, k) => (
             <div key={k} className="card space-y-2 p-4">
-              <div className="text-xs text-[#8d99b3]">Uppgift {k + 1}</div>
+              <div className="text-xs text-muted">Uppgift {k + 1}</div>
               <Rich text={started!.exercises[k].prompt} />
               <Feedback result={it} explanation={it.explanation} />
             </div>
@@ -196,8 +196,8 @@ export function AssessmentRunner({ lessonId, kind, title, onClose, startLabel, a
   const last = i === started.exercises.length - 1;
   return (
     <div className="space-y-4">
-      {error && <div className="rounded-xl border border-[#ef6a6a]/40 bg-[#ef6a6a]/10 p-3 text-sm text-[#ef6a6a]">{error}</div>}
-      <div className="flex items-center gap-3"><Bar value={(i + 1) / started.exercises.length} /><span className="whitespace-nowrap text-sm text-[#8d99b3]">{i + 1}/{started.exercises.length}</span></div>
+      {error && <div className="rounded-xl border border-bad/40 bg-bad/10 p-3 text-sm text-bad">{error}</div>}
+      <div className="flex items-center gap-3"><Bar value={(i + 1) / started.exercises.length} /><span className="whitespace-nowrap text-sm text-muted">{i + 1}/{started.exercises.length}</span></div>
       <div className="card space-y-4 p-5">
         <ExerciseView key={spec.id} spec={spec} value={answers[i]} onChange={(a) => setAnswers((arr) => arr.map((x, k) => (k === i ? a : x)))} />
         <div className="flex gap-2">
@@ -206,7 +206,7 @@ export function AssessmentRunner({ lessonId, kind, title, onClose, startLabel, a
             : <button className="btn btn-gold flex-1" disabled={answers.some((a, k) => !isAnswered(started.exercises[k], a))} onClick={submit}>Lämna in</button>}
         </div>
       </div>
-      <p className="text-center text-xs text-[#8d99b3]">Provet rättas på servern. Inga ledtrådar under provet.</p>
+      <p className="text-center text-xs text-muted">Provet rättas på servern. Inga ledtrådar under provet.</p>
     </div>
   );
 }

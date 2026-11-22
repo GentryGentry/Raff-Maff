@@ -26,7 +26,7 @@ export default function Login() {
 
   return (
     <main className="safe-top mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-6 px-6">
-      <div className="text-center"><div className="text-5xl">🧮</div><h1 className="mt-2 text-4xl font-bold tracking-tight">Raff <span className="text-[#e8b64a]">Maff</span></h1><p className="mt-2 text-[#8d99b3]">Matematik för åk 4–6 – och konsten att lära ut den.</p></div>
+      <div className="text-center"><h1 className="mt-2 text-4xl font-bold tracking-tight">Raff <span className="text-ink">Maff</span></h1><p className="mt-2 text-muted">Matematik för åk 4–6 – och konsten att lära ut den.</p></div>
       {cfg && !cfg.passcode ? (
         <div className="card space-y-3 p-5 text-center">
           <p>{cfg.dev ? "Lokalt utvecklingsläge: ingen åtkomstkod är satt, så du kommer in direkt. Framsteg sparas lokalt i ~/.raff-maff-dev/." : "Servern saknar APP_PASSCODE. Sätt den som miljövariabel (se README) och starta om."}</p>
@@ -34,12 +34,12 @@ export default function Login() {
         </div>
       ) : (
         <form onSubmit={submit} className="card space-y-3 p-5">
-          <label className="block text-sm text-[#8d99b3]">Åtkomstkod
+          <label className="block text-sm text-muted">Åtkomstkod
             <input className="field mt-1" type="password" required autoFocus autoComplete="current-password" value={code} onChange={(e) => setCode(e.target.value)} placeholder="Din åtkomstkod" />
           </label>
-          {msg && <p className="text-sm text-[#f3d58a]" role="alert">{msg}</p>}
+          {msg && <p className="text-sm text-ink" role="alert">{msg}</p>}
           <button className="btn btn-gold w-full" disabled={busy}>{busy ? "Kontrollerar …" : "Öppna"}</button>
-          <p className="text-center text-xs text-[#8d99b3]">Du behöver bara skriva den en gång – telefonen kommer ihåg dig.</p>
+          <p className="text-center text-xs text-muted">Du behöver bara skriva den en gång – telefonen kommer ihåg dig.</p>
         </form>
       )}
     </main>

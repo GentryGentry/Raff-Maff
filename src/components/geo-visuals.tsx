@@ -1,10 +1,10 @@
 "use client";
 import type { P2, PlaneSpec, Visual } from "@/lib/engine/types";
 
-const GOLD = "#e8b64a";
-const BLUE = "#3b82f6";
-const LINE = "#3a4c78";
-const MUTED = "#8d99b3";
+const GOLD = "var(--amber)";
+const BLUE = "var(--fig)";
+const LINE = "var(--rule)";
+const MUTED = "var(--muted)";
 
 type PolyV = Extract<Visual, { type: "polygon" }>;
 
@@ -48,12 +48,12 @@ export function PolygonV({ pts, grid, sides, right, ticks, vlabels, angles, dash
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-sm" role="img" aria-label="Geometrisk figur">
       <polygon points={sp.map((p) => p.join(",")).join(" ")} fill={BLUE} fillOpacity={0.28} stroke="none" />
       {grid && (
-        <g stroke="#5f74a8" strokeWidth={1}>
+        <g stroke="var(--rule)" strokeWidth={1}>
           {Array.from({ length: gx1 - gx0 + 1 }, (_, i) => <line key={`v${i}`} x1={X(gx0 + i)} y1={Y(minY)} x2={X(gx0 + i)} y2={Y(maxY)} />)}
           {Array.from({ length: gy1 - gy0 + 1 }, (_, i) => <line key={`h${i}`} x1={X(minX)} y1={Y(gy0 + i)} x2={X(maxX)} y2={Y(gy0 + i)} />)}
         </g>
       )}
-      <polygon points={sp.map((p) => p.join(",")).join(" ")} fill="none" stroke="#fff" strokeWidth={2} strokeLinejoin="round" />
+      <polygon points={sp.map((p) => p.join(",")).join(" ")} fill="none" stroke="var(--ink)" strokeWidth={2} strokeLinejoin="round" />
       {(dash ?? []).map((d, i) => {
         const a: P2 = [X(d.a[0]), Y(d.a[1])], b: P2 = [X(d.b[0]), Y(d.b[1])];
         return (
@@ -74,7 +74,7 @@ export function PolygonV({ pts, grid, sides, right, ticks, vlabels, angles, dash
         const d = unit(b[0] - a[0], b[1] - a[1]), nr: P2 = [-d[1], d[0]];
         return <g key={`t${i}`} stroke={GOLD} strokeWidth={2}>{Array.from({ length: k }, (_, j) => { const o = (j - (k - 1) / 2) * 5; return <line key={j} x1={mx + d[0] * o - nr[0] * 5} y1={my + d[1] * o - nr[1] * 5} x2={mx + d[0] * o + nr[0] * 5} y2={my + d[1] * o + nr[1] * 5} />; })}</g>;
       })}
-      {labelPlacements.map((lb) => <text key={`s${lb.i}`} x={lb.x} y={lb.y + 4} textAnchor="middle" fill="#fff" fontSize={13} fontWeight={600}>{lb.txt}</text>)}
+      {labelPlacements.map((lb) => <text key={`s${lb.i}`} x={lb.x} y={lb.y + 4} textAnchor="middle" fill="var(--ink)" fontSize={13} fontWeight={600}>{lb.txt}</text>)}
       {(angles ?? []).map((an, i) => {
         const v = sp[an.at], p = sp[(an.at + n - 1) % n], q = sp[(an.at + 1) % n];
         const u = unit(p[0] - v[0], p[1] - v[1]), t = unit(q[0] - v[0], q[1] - v[1]);
@@ -110,17 +110,17 @@ export function AngleV({ deg, protractor, base = "right", label }: { deg: number
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-sm" role="img" aria-label={protractor ? "Gradskiva med en vinkel" : "En vinkel"}>
       {protractor && (
         <g>
-          <path d={`M ${cx - R} ${cy} A ${R} ${R} 0 0 1 ${cx + R} ${cy} Z`} fill="#182848" fillOpacity={0.85} stroke={LINE} />
+          <path d={`M ${cx - R} ${cy} A ${R} ${R} 0 0 1 ${cx + R} ${cy} Z`} fill="var(--paper2)" fillOpacity={0.85} stroke={LINE} />
           {Array.from({ length: 37 }, (_, i) => {
             const a = i * 5, big = a % 10 === 0;
             const [x1, y1] = pt(a, R), [x2, y2] = pt(a, R - (big ? 9 : 5));
             return <line key={a} x1={x1} y1={y1} x2={x2} y2={y2} stroke={MUTED} strokeWidth={big ? 1 : 0.6} />;
           })}
-          <circle cx={cx} cy={cy} r={2.5} fill="#fff" />
+          <circle cx={cx} cy={cy} r={2.5} fill="var(--ink)" />
         </g>
       )}
       <line x1={cx - (protractor ? R + 10 : R)} y1={cy} x2={cx + (protractor ? R + 10 : R)} y2={cy} stroke={LINE} strokeWidth={1.5} />
-      <line x1={cx} y1={cy} x2={baseEnd[0]} y2={baseEnd[1]} stroke="#fff" strokeWidth={3} strokeLinecap="round" />
+      <line x1={cx} y1={cy} x2={baseEnd[0]} y2={baseEnd[1]} stroke="var(--ink)" strokeWidth={3} strokeLinecap="round" />
       <line x1={cx} y1={cy} x2={rayEnd[0]} y2={rayEnd[1]} stroke={GOLD} strokeWidth={3} strokeLinecap="round" />
       {protractor && (
         <g>
@@ -128,8 +128,8 @@ export function AngleV({ deg, protractor, base = "right", label }: { deg: number
             const a = i * 10;
             const [ox, oy] = pt(a, R - 19), [ix, iy] = pt(a, R - 33);
             return (
-              <g key={a} fontSize={8.5} textAnchor="middle" stroke="#182848" strokeWidth={2.2} paintOrder="stroke">
-                <text x={ox} y={oy + 3} fill="#fff">{a}</text>
+              <g key={a} fontSize={8.5} textAnchor="middle" stroke="var(--paper2)" strokeWidth={2.2} paintOrder="stroke">
+                <text x={ox} y={oy + 3} fill="var(--ink)">{a}</text>
                 <text x={ix} y={iy + 3} fill={GOLD}>{180 - a}</text>
               </g>
             );
@@ -162,14 +162,14 @@ export function CoordPlane({ xmax, ymax, points, poly, mirrorX, mirrorY, picked,
       <text x={X(0) - 4} y={Yc(ymax) - 8} textAnchor="middle" fill={GOLD} fontSize={12} fontWeight={700}>y</text>
       {mirrorX != null && <line x1={X(mirrorX)} y1={Yc(0)} x2={X(mirrorX)} y2={Yc(ymax)} stroke={GOLD} strokeWidth={2} strokeDasharray="6 4" />}
       {mirrorY != null && <line x1={X(0)} y1={Yc(mirrorY)} x2={X(xmax)} y2={Yc(mirrorY)} stroke={GOLD} strokeWidth={2} strokeDasharray="6 4" />}
-      {poly && <polygon points={poly.map(([x, y]) => `${X(x)},${Yc(y)}`).join(" ")} fill={BLUE} fillOpacity={0.25} stroke="#fff" strokeWidth={2} strokeLinejoin="round" />}
+      {poly && <polygon points={poly.map(([x, y]) => `${X(x)},${Yc(y)}`).join(" ")} fill={BLUE} fillOpacity={0.25} stroke="var(--ink)" strokeWidth={2} strokeLinejoin="round" />}
       {(points ?? []).map((p, i) => (
         <g key={`p${i}`}>
-          <circle cx={X(p.x)} cy={Yc(p.y)} r={5} fill={GOLD} stroke="#0b1428" strokeWidth={1.5} />
-          {p.label && <text x={X(p.x) + 8} y={Yc(p.y) - 7} fill="#fff" fontSize={13} fontWeight={700}>{p.label}</text>}
+          <circle cx={X(p.x)} cy={Yc(p.y)} r={5} fill={GOLD} stroke="var(--paper)" strokeWidth={1.5} />
+          {p.label && <text x={X(p.x) + 8} y={Yc(p.y) - 7} fill="var(--ink)" fontSize={13} fontWeight={700}>{p.label}</text>}
         </g>
       ))}
-      {picked && <circle cx={X(picked.x)} cy={Yc(picked.y)} r={7} fill="#ef4444" stroke="#fff" strokeWidth={2} />}
+      {picked && <circle cx={X(picked.x)} cy={Yc(picked.y)} r={7} fill="var(--bad)" stroke="var(--ink)" strokeWidth={2} />}
       {onPick && Array.from({ length: (xmax + 1) * (ymax + 1) }, (_, i) => {
         const x = i % (xmax + 1), y = Math.floor(i / (xmax + 1));
         return (
@@ -190,7 +190,7 @@ export function CuboidV({ l, b, h, labels }: { l: number; b: number; h: number; 
   const x0 = 22, yb = H - 20; // front-bottom-left corner
   const F = (i: number, j: number): P2 => [x0 + i * u, yb - j * u]; // front face
   const D = (p: P2, d: number): P2 => [p[0] + d * dx, p[1] - d * dy];
-  const line = (a: P2, c: P2, key: string, w = 0.8) => <line key={key} x1={a[0]} y1={a[1]} x2={c[0]} y2={c[1]} stroke="#fff" strokeOpacity={0.45} strokeWidth={w} />;
+  const line = (a: P2, c: P2, key: string, w = 0.8) => <line key={key} x1={a[0]} y1={a[1]} x2={c[0]} y2={c[1]} stroke="var(--ink)" strokeOpacity={0.45} strokeWidth={w} />;
   const ls: React.ReactNode[] = [];
   for (let i = 0; i <= l; i++) ls.push(line(F(i, 0), F(i, h), `fv${i}`), line(F(i, h), D(F(i, h), b), `tv${i}`));
   for (let j = 0; j <= h; j++) ls.push(line(F(0, j), F(l, j), `fh${j}`), line(F(l, j), D(F(l, j), b), `sh${j}`));
@@ -198,13 +198,13 @@ export function CuboidV({ l, b, h, labels }: { l: number; b: number; h: number; 
   const poly = (pts: P2[], fill: string) => <polygon points={pts.map((p) => p.join(",")).join(" ")} fill={fill} />;
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-sm" role="img" aria-label={`Rätblock ${l} · ${b} · ${h}`}>
-      {poly([F(0, 0), F(l, 0), F(l, h), F(0, h)], "#3b82f6")}
-      {poly([F(0, h), F(l, h), D(F(l, h), b), D(F(0, h), b)], "#60a5fa")}
-      {poly([F(l, 0), D(F(l, 0), b), D(F(l, h), b), F(l, h)], "#2563eb")}
+      {poly([F(0, 0), F(l, 0), F(l, h), F(0, h)], "var(--fig)")}
+      {poly([F(0, h), F(l, h), D(F(l, h), b), D(F(0, h), b)], "var(--fig2)")}
+      {poly([F(l, 0), D(F(l, 0), b), D(F(l, h), b), F(l, h)], "var(--fig3)")}
       {ls}
-      <polyline points={[F(0, 0), F(l, 0), F(l, h), F(0, h), F(0, 0)].map((p) => p.join(",")).join(" ")} fill="none" stroke="#fff" strokeWidth={1.6} />
-      <polyline points={[F(0, h), D(F(0, h), b), D(F(l, h), b), F(l, h)].map((p) => p.join(",")).join(" ")} fill="none" stroke="#fff" strokeWidth={1.6} />
-      <polyline points={[F(l, 0), D(F(l, 0), b), D(F(l, h), b)].map((p) => p.join(",")).join(" ")} fill="none" stroke="#fff" strokeWidth={1.6} />
+      <polyline points={[F(0, 0), F(l, 0), F(l, h), F(0, h), F(0, 0)].map((p) => p.join(",")).join(" ")} fill="none" stroke="var(--ink)" strokeWidth={1.6} />
+      <polyline points={[F(0, h), D(F(0, h), b), D(F(l, h), b), F(l, h)].map((p) => p.join(",")).join(" ")} fill="none" stroke="var(--ink)" strokeWidth={1.6} />
+      <polyline points={[F(l, 0), D(F(l, 0), b), D(F(l, h), b)].map((p) => p.join(",")).join(" ")} fill="none" stroke="var(--ink)" strokeWidth={1.6} />
       {labels && (
         <g fill={GOLD} fontSize={13} fontWeight={700}>
           <text x={x0 + (l * u) / 2} y={yb + 16} textAnchor="middle">{labels[0]}</text>
@@ -218,20 +218,20 @@ export function CuboidV({ l, b, h, labels }: { l: number; b: number; h: number; 
 
 /** Simple line drawings of the common solids. */
 export function SolidV({ shape }: { shape: "cylinder" | "cone" | "pyramid" | "sphere" | "prism" | "cube" | "cuboid" }) {
-  const stroke = { stroke: "#fff", strokeWidth: 1.8, strokeLinejoin: "round" as const };
+  const stroke = { stroke: "var(--ink)", strokeWidth: 1.8, strokeLinejoin: "round" as const };
   const names = { cylinder: "Cylinder", cone: "Kon", pyramid: "Pyramid", sphere: "Klot", prism: "Triangelprisma", cube: "Kub", cuboid: "Rätblock" };
   let body: React.ReactNode;
   switch (shape) {
-    case "cylinder": body = (<g><path d="M 60 40 L 60 120 A 50 14 0 0 0 160 120 L 160 40" fill={BLUE} fillOpacity={0.5} {...stroke} /><ellipse cx={110} cy={40} rx={50} ry={14} fill="#60a5fa" fillOpacity={0.6} {...stroke} /></g>); break;
+    case "cylinder": body = (<g><path d="M 60 40 L 60 120 A 50 14 0 0 0 160 120 L 160 40" fill={BLUE} fillOpacity={0.5} {...stroke} /><ellipse cx={110} cy={40} rx={50} ry={14} fill="var(--fig2)" fillOpacity={0.6} {...stroke} /></g>); break;
     case "cone": body = (<g><path d="M 110 20 L 60 120 A 50 14 0 0 0 160 120 Z" fill={BLUE} fillOpacity={0.5} {...stroke} /></g>); break;
-    case "pyramid": body = (<g><polygon points="110,18 50,112 120,132 170,104" fill={BLUE} fillOpacity={0.5} {...stroke} /><line x1={110} y1={18} x2={120} y2={132} {...stroke} /><polyline points="50,112 90,100 170,104" fill="none" stroke="#fff" strokeWidth={1.4} strokeDasharray="4 4" /><line x1={90} y1={100} x2={110} y2={18} stroke="#fff" strokeWidth={1.4} strokeDasharray="4 4" /></g>); break;
-    case "sphere": body = (<g><circle cx={110} cy={78} r={56} fill={BLUE} fillOpacity={0.45} {...stroke} /><ellipse cx={110} cy={78} rx={56} ry={14} fill="none" stroke="#fff" strokeOpacity={0.5} strokeDasharray="4 4" /></g>); break;
+    case "pyramid": body = (<g><polygon points="110,18 50,112 120,132 170,104" fill={BLUE} fillOpacity={0.5} {...stroke} /><line x1={110} y1={18} x2={120} y2={132} {...stroke} /><polyline points="50,112 90,100 170,104" fill="none" stroke="var(--ink)" strokeWidth={1.4} strokeDasharray="4 4" /><line x1={90} y1={100} x2={110} y2={18} stroke="var(--ink)" strokeWidth={1.4} strokeDasharray="4 4" /></g>); break;
+    case "sphere": body = (<g><circle cx={110} cy={78} r={56} fill={BLUE} fillOpacity={0.45} {...stroke} /><ellipse cx={110} cy={78} rx={56} ry={14} fill="none" stroke="var(--ink)" strokeOpacity={0.5} strokeDasharray="4 4" /></g>); break;
     case "prism": body = (
       <g transform="translate(18 4)">
-        <polygon points="40,125 75,70 145,42 110,97" fill="#60a5fa" fillOpacity={0.5} {...stroke} />
-        <polygon points="110,125 180,97 145,42 75,70" fill="#2563eb" fillOpacity={0.7} {...stroke} />
+        <polygon points="40,125 75,70 145,42 110,97" fill="var(--fig2)" fillOpacity={0.5} {...stroke} />
+        <polygon points="110,125 180,97 145,42 75,70" fill="var(--fig3)" fillOpacity={0.7} {...stroke} />
         <polygon points="40,125 110,125 75,70" fill={BLUE} fillOpacity={0.85} {...stroke} />
-        <polyline points="110,97 180,97" fill="none" stroke="#fff" strokeWidth={1.4} strokeDasharray="4 4" />
+        <polyline points="110,97 180,97" fill="none" stroke="var(--ink)" strokeWidth={1.4} strokeDasharray="4 4" />
       </g>
     ); break;
     case "cube": body = <CuboidInline l={1} b={1} h={1} u={56} />; break;
@@ -249,12 +249,12 @@ function CuboidInline({ l, b, h, u }: { l: number; b: number; h: number; u: numb
   const x0 = (220 - w) / 2, yb = (150 + ht) / 2;
   const F = (i: number, j: number): P2 => [x0 + i * u, yb - j * u];
   const D = (p: P2): P2 => [p[0] + b * dx, p[1] - b * dy];
-  const pl = (pts: P2[], fill: string) => <polygon points={pts.map((p) => p.join(",")).join(" ")} fill={fill} stroke="#fff" strokeWidth={1.8} strokeLinejoin="round" />;
+  const pl = (pts: P2[], fill: string) => <polygon points={pts.map((p) => p.join(",")).join(" ")} fill={fill} stroke="var(--ink)" strokeWidth={1.8} strokeLinejoin="round" />;
   return (
     <g>
-      {pl([F(0, 0), F(l, 0), F(l, h), F(0, h)], "#3b82f6")}
-      {pl([F(0, h), F(l, h), D(F(l, h)), D(F(0, h))], "#60a5fa")}
-      {pl([F(l, 0), D(F(l, 0)), D(F(l, h)), F(l, h)], "#2563eb")}
+      {pl([F(0, 0), F(l, 0), F(l, h), F(0, h)], "var(--fig)")}
+      {pl([F(0, h), F(l, h), D(F(l, h)), D(F(0, h))], "var(--fig2)")}
+      {pl([F(l, 0), D(F(l, 0)), D(F(l, h)), F(l, h)], "var(--fig3)")}
     </g>
   );
 }
@@ -266,20 +266,20 @@ export function CircleV({ line, rLabel, dLabel }: { line: "radius" | "diameter" 
   const rx = cx + r * Math.cos(ang), ry = cy + r * Math.sin(ang);
   return (
     <svg viewBox="0 0 260 160" className="w-full max-w-[16rem]" role="img" aria-label="Cirkel">
-      <circle cx={cx} cy={cy} r={r} fill={BLUE} fillOpacity={0.25} stroke="#fff" strokeWidth={2} />
+      <circle cx={cx} cy={cy} r={r} fill={BLUE} fillOpacity={0.25} stroke="var(--ink)" strokeWidth={2} />
       {(line === "diameter" || line === "both") && (
         <g>
-          <line x1={cx - r} y1={cy} x2={cx + r} y2={cy} stroke={line === "both" ? "#60a5fa" : GOLD} strokeWidth={3} strokeLinecap="round" />
-          {dLabel && <text x={cx - 8} y={cy + 18} textAnchor="middle" fill="#fff" fontSize={13} fontWeight={700}>{dLabel}</text>}
+          <line x1={cx - r} y1={cy} x2={cx + r} y2={cy} stroke={line === "both" ? "var(--fig2)" : GOLD} strokeWidth={3} strokeLinecap="round" />
+          {dLabel && <text x={cx - 8} y={cy + 18} textAnchor="middle" fill="var(--ink)" fontSize={13} fontWeight={700}>{dLabel}</text>}
         </g>
       )}
       {(line === "radius" || line === "both") && (
         <g>
           <line x1={cx} y1={cy} x2={rx} y2={ry} stroke={GOLD} strokeWidth={3} strokeLinecap="round" />
-          {rLabel && <text x={(cx + rx) / 2 + 6} y={(cy + ry) / 2 - 8} fill="#fff" fontSize={13} fontWeight={700}>{rLabel}</text>}
+          {rLabel && <text x={(cx + rx) / 2 + 6} y={(cy + ry) / 2 - 8} fill="var(--ink)" fontSize={13} fontWeight={700}>{rLabel}</text>}
         </g>
       )}
-      <circle cx={cx} cy={cy} r={4} fill="#fff" />
+      <circle cx={cx} cy={cy} r={4} fill="var(--ink)" />
     </svg>
   );
 }
@@ -292,12 +292,12 @@ export function RulerV({ cm, from, to }: { cm: number; from: number; to: number 
       <rect x={X(from)} y={14} width={X(to) - X(from)} height={20} rx={4} fill={GOLD} fillOpacity={0.9} />
       <line x1={X(from)} y1={34} x2={X(from)} y2={top} stroke={GOLD} strokeDasharray="3 3" />
       <line x1={X(to)} y1={34} x2={X(to)} y2={top} stroke={GOLD} strokeDasharray="3 3" />
-      <rect x={x0 - 6} y={top} width={cm * 10 * px + 12} height={42} rx={4} fill="#182848" stroke={LINE} />
+      <rect x={x0 - 6} y={top} width={cm * 10 * px + 12} height={42} rx={4} fill="var(--paper2)" stroke={LINE} />
       {Array.from({ length: cm * 10 + 1 }, (_, i) => {
         const big = i % 10 === 0, mid = i % 5 === 0;
-        return <line key={i} x1={X(i)} y1={top} x2={X(i)} y2={top + (big ? 18 : mid ? 13 : 8)} stroke="#fff" strokeOpacity={big ? 0.95 : 0.6} strokeWidth={big ? 1.4 : 0.8} />;
+        return <line key={i} x1={X(i)} y1={top} x2={X(i)} y2={top + (big ? 18 : mid ? 13 : 8)} stroke="var(--ink)" strokeOpacity={big ? 0.95 : 0.6} strokeWidth={big ? 1.4 : 0.8} />;
       })}
-      {Array.from({ length: cm + 1 }, (_, i) => <text key={i} x={X(i * 10)} y={top + 34} textAnchor="middle" fill="#fff" fontSize={11}>{i}</text>)}
+      {Array.from({ length: cm + 1 }, (_, i) => <text key={i} x={X(i * 10)} y={top + 34} textAnchor="middle" fill="var(--ink)" fontSize={11}>{i}</text>)}
     </svg>
   );
 }
@@ -310,10 +310,10 @@ export function ClockV({ h, m }: { h: number; m: number }) {
   const hp = pt(hd, r * 0.36), mp = pt(md, r * 0.64);
   return (
     <svg viewBox="0 0 180 180" className="w-full max-w-[13rem]" role="img" aria-label="Analog klocka">
-      <circle cx={cx} cy={cy} r={r} fill="#182848" stroke="#fff" strokeWidth={2.5} />
-      {Array.from({ length: 60 }, (_, i) => { const a = pt(i * 6, r - 2), b = pt(i * 6, r - (i % 5 === 0 ? 9 : 5)); return <line key={i} x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke="#fff" strokeOpacity={0.7} strokeWidth={i % 5 === 0 ? 1.6 : 0.7} />; })}
-      {Array.from({ length: 12 }, (_, i) => { const p = pt((i + 1) * 30, r - 21); return <text key={i} x={p[0]} y={p[1] + 5} textAnchor="middle" fill="#fff" fontSize={14} fontWeight={600}>{i + 1}</text>; })}
-      <line x1={cx} y1={cy} x2={hp[0]} y2={hp[1]} stroke="#fff" strokeWidth={5} strokeLinecap="round" />
+      <circle cx={cx} cy={cy} r={r} fill="var(--paper2)" stroke="var(--ink)" strokeWidth={2.5} />
+      {Array.from({ length: 60 }, (_, i) => { const a = pt(i * 6, r - 2), b = pt(i * 6, r - (i % 5 === 0 ? 9 : 5)); return <line key={i} x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke="var(--ink)" strokeOpacity={0.7} strokeWidth={i % 5 === 0 ? 1.6 : 0.7} />; })}
+      {Array.from({ length: 12 }, (_, i) => { const p = pt((i + 1) * 30, r - 21); return <text key={i} x={p[0]} y={p[1] + 5} textAnchor="middle" fill="var(--ink)" fontSize={14} fontWeight={600}>{i + 1}</text>; })}
+      <line x1={cx} y1={cy} x2={hp[0]} y2={hp[1]} stroke="var(--ink)" strokeWidth={5} strokeLinecap="round" />
       <line x1={cx} y1={cy} x2={mp[0]} y2={mp[1]} stroke={GOLD} strokeWidth={3} strokeLinecap="round" />
       <circle cx={cx} cy={cy} r={4} fill={GOLD} />
     </svg>
@@ -347,7 +347,7 @@ export function BarChartV({ cats, vals, max, step, min = 0, unit }: { cats: stri
         return (
           <g key={c}>
             <rect x={cx - bw / 2} y={Y(vals[i])} width={bw} height={Math.max(0, Y(min) - Y(vals[i]))} rx={2} fill={BLUE} />
-            <text x={cx} y={H - bottom + 15} textAnchor="middle" fill="#fff" fontSize={11}>{c}</text>
+            <text x={cx} y={H - bottom + 15} textAnchor="middle" fill="var(--ink)" fontSize={11}>{c}</text>
           </g>
         );
       })}
@@ -367,8 +367,8 @@ export function LineChartV({ xs, ys, max, step, min = 0, unit }: { xs: string[];
         <g key={t}><line x1={left} y1={Y(t)} x2={W - right} y2={Y(t)} stroke={LINE} strokeWidth={t === min ? 1.6 : 0.8} /><text x={left - 5} y={Y(t) + 4} textAnchor="end" fill={MUTED} fontSize={11}>{t}</text></g>
       ))}
       <polyline points={ys.map((y, i) => `${X(i)},${Y(y)}`).join(" ")} fill="none" stroke={GOLD} strokeWidth={2.5} strokeLinejoin="round" />
-      {ys.map((y, i) => <circle key={i} cx={X(i)} cy={Y(y)} r={4} fill={GOLD} stroke="#0b1428" strokeWidth={1.5} />)}
-      {xs.map((x, i) => <text key={x} x={X(i)} y={H - bottom + 15} textAnchor="middle" fill="#fff" fontSize={11}>{x}</text>)}
+      {ys.map((y, i) => <circle key={i} cx={X(i)} cy={Y(y)} r={4} fill={GOLD} stroke="var(--paper)" strokeWidth={1.5} />)}
+      {xs.map((x, i) => <text key={x} x={X(i)} y={H - bottom + 15} textAnchor="middle" fill="var(--ink)" fontSize={11}>{x}</text>)}
       {unit && <text x={4} y={10} fill={GOLD} fontSize={11}>{unit}</text>}
     </svg>
   );
@@ -382,7 +382,7 @@ export function PictogramV({ rows, per }: { rows: { label: string; count: number
     <svg viewBox={`0 0 ${Math.max(W, 220)} ${rows.length * rh + 30}`} className="w-full max-w-sm" role="img" aria-label="Piktogram">
       {rows.map((r, i) => (
         <g key={r.label}>
-          <text x={4} y={i * rh + 20} fill="#fff" fontSize={12}>{r.label}</text>
+          <text x={4} y={i * rh + 20} fill="var(--ink)" fontSize={12}>{r.label}</text>
           {Array.from({ length: r.count }, (_, k) => <circle key={k} cx={lw + k * 24 + 10} cy={i * rh + 15} r={9} fill={GOLD} />)}
         </g>
       ))}
@@ -398,8 +398,8 @@ export function MarblesV({ counts }: { counts: { color: string; n: number }[] })
   const rows = Math.ceil(all.length / perRow);
   return (
     <svg viewBox={`0 0 ${perRow * 32 + 16} ${rows * 32 + 16}`} className="w-full max-w-xs" role="img" aria-label="Påse med kulor">
-      <rect x={2} y={2} width={perRow * 32 + 12} height={rows * 32 + 12} rx={14} fill="#182848" stroke={LINE} />
-      {all.map((c, i) => <circle key={i} cx={16 + (i % perRow) * 32 + 8} cy={16 + Math.floor(i / perRow) * 32 + 4} r={r} fill={COLORS[c] ?? "#999"} stroke="#fff" strokeOpacity={0.5} />)}
+      <rect x={2} y={2} width={perRow * 32 + 12} height={rows * 32 + 12} rx={14} fill="var(--paper2)" stroke={LINE} />
+      {all.map((c, i) => <circle key={i} cx={16 + (i % perRow) * 32 + 8} cy={16 + Math.floor(i / perRow) * 32 + 4} r={r} fill={COLORS[c] ?? "#999"} stroke="var(--ink)" strokeOpacity={0.5} />)}
     </svg>
   );
 }
@@ -409,9 +409,9 @@ export function SpinnerV({ sectors }: { sectors: string[] }) {
   const pt = (k: number): P2 => [cx + r * Math.sin((k / n) * 2 * Math.PI), cy - r * Math.cos((k / n) * 2 * Math.PI)];
   return (
     <svg viewBox="0 0 180 180" className="w-full max-w-[13rem]" role="img" aria-label="Snurra">
-      {sectors.map((c, i) => { const a = pt(i), b = pt(i + 1); return <path key={i} d={`M ${cx} ${cy} L ${a[0]} ${a[1]} A ${r} ${r} 0 0 1 ${b[0]} ${b[1]} Z`} fill={COLORS[c] ?? "#999"} stroke="#fff" strokeWidth={2} />; })}
-      <circle cx={cx} cy={cy} r={5} fill="#0b1428" />
-      <polygon points={`${cx},${cy - 8} ${cx - 6},${cy - 24} ${cx + 6},${cy - 24}`} fill="#fff" transform={`rotate(20 ${cx} ${cy})`} />
+      {sectors.map((c, i) => { const a = pt(i), b = pt(i + 1); return <path key={i} d={`M ${cx} ${cy} L ${a[0]} ${a[1]} A ${r} ${r} 0 0 1 ${b[0]} ${b[1]} Z`} fill={COLORS[c] ?? "#999"} stroke="var(--ink)" strokeWidth={2} />; })}
+      <circle cx={cx} cy={cy} r={5} fill="var(--paper)" />
+      <polygon points={`${cx},${cy - 8} ${cx - 6},${cy - 24} ${cx + 6},${cy - 24}`} fill="var(--ink)" transform={`rotate(20 ${cx} ${cy})`} />
     </svg>
   );
 }
@@ -426,8 +426,8 @@ export function ComboTableV({ rows, cols }: { rows: string[]; cols: string[] }) 
           <text x={4} y={(i + 1) * rh + 20} fill={GOLD} fontSize={12} fontWeight={700}>{r}</text>
           {cols.map((c, j) => (
             <g key={c}>
-              <rect x={lw + j * cw + 2} y={(i + 1) * rh + 3} width={cw - 4} height={rh - 4} rx={5} fill={BLUE} fillOpacity={0.3} stroke="#fff" strokeOpacity={0.4} />
-              <text x={lw + j * cw + cw / 2} y={(i + 1) * rh + 22} textAnchor="middle" fill="#fff" fontSize={12}>{r[0]}{c[0]}</text>
+              <rect x={lw + j * cw + 2} y={(i + 1) * rh + 3} width={cw - 4} height={rh - 4} rx={5} fill={BLUE} fillOpacity={0.3} stroke="var(--ink)" strokeOpacity={0.4} />
+              <text x={lw + j * cw + cw / 2} y={(i + 1) * rh + 22} textAnchor="middle" fill="var(--ink)" fontSize={12}>{r[0]}{c[0]}</text>
             </g>
           ))}
         </g>
@@ -445,11 +445,11 @@ export function BarModelV({ rows, total, boxLabel }: { rows: { label: string; pa
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-sm" role="img" aria-label="Stapelmodell">
       {rows.map((r, i) => (
         <g key={r.label}>
-          <text x={4} y={i * rh + 24} fill="#fff" fontSize={12} fontWeight={600}>{r.label}</text>
+          <text x={4} y={i * rh + 24} fill="var(--ink)" fontSize={12} fontWeight={600}>{r.label}</text>
           {Array.from({ length: r.parts }, (_, k) => (
-            <g key={k}><rect x={lw + k * bw} y={i * rh + 6} width={bw - 2} height={26} rx={4} fill={BLUE} fillOpacity={0.55} stroke="#fff" strokeOpacity={0.7} />{boxLabel && <text x={lw + k * bw + (bw - 2) / 2} y={i * rh + 24} textAnchor="middle" fill="#fff" fontSize={10}>{boxLabel}</text>}</g>
+            <g key={k}><rect x={lw + k * bw} y={i * rh + 6} width={bw - 2} height={26} rx={4} fill={BLUE} fillOpacity={0.55} stroke="var(--ink)" strokeOpacity={0.7} />{boxLabel && <text x={lw + k * bw + (bw - 2) / 2} y={i * rh + 24} textAnchor="middle" fill="var(--ink)" fontSize={10}>{boxLabel}</text>}</g>
           ))}
-          {r.extra && <g><rect x={lw + r.parts * bw} y={i * rh + 6} width={r.extra.n * bw - 2} height={26} rx={4} fill={GOLD} fillOpacity={0.6} stroke="#fff" strokeOpacity={0.7} /><text x={lw + r.parts * bw + (r.extra.n * bw - 2) / 2} y={i * rh + 24} textAnchor="middle" fill="#fff" fontSize={11} fontWeight={700}>{r.extra.label}</text></g>}
+          {r.extra && <g><rect x={lw + r.parts * bw} y={i * rh + 6} width={r.extra.n * bw - 2} height={26} rx={4} fill={GOLD} fillOpacity={0.6} stroke="var(--ink)" strokeOpacity={0.7} /><text x={lw + r.parts * bw + (r.extra.n * bw - 2) / 2} y={i * rh + 24} textAnchor="middle" fill="var(--ink)" fontSize={11} fontWeight={700}>{r.extra.label}</text></g>}
           {r.end && <text x={lw + (r.parts + (r.extra?.n ?? 0)) * bw + 6} y={i * rh + 24} fill={GOLD} fontSize={13} fontWeight={700}>{r.end}</text>}
         </g>
       ))}

@@ -113,7 +113,7 @@ export const lesson8: Lesson = {
     { id: "speedSteps", skill: "w11-l8.speed", gen: (rng) => { const v = rng.pick([20, 40, 60]), t = rng.pick([6, 12, 15, 30, 45]); return multifield(`ss-${v}-${t}`, "w11-l8.speed", `Du cyklar ${v} km/h i ${t} minuter. Räkna i steg.`, [{ label: "Tiden i timmar", suffix: "tim", accept: [String(t / 60)] }, { label: "Sträckan", suffix: "km", accept: [String((v * t) / 60)] }], `${t} min = ${t / 60} tim. ${v} · ${t / 60} = ${(v * t) / 60} km.`, ["Tid i timmar först."]); } },
   ],
   representation: [
-    { id: "rulerRead", skill: "w11-l8.ruler", gen: (rng) => { const from = rng.int(0, 3) * 10, len = rng.int(15, Math.min(75, 95 - from)); return withVisual(numeric(`rr-${from}-${len}`, "w11-l8.ruler", "Hur långt är föremålet (gult) i millimeter?", len, `Längd = slut − början = ${(from + len) / 10} − ${from / 10} = ${len / 10} cm = ${len} mm.`, ["Slut minus början."], "mm"), { type: "ruler", cm: 10, from, to: from + len }); } },
+    { id: "rulerRead", skill: "w11-l8.ruler", gen: (rng) => { const from = rng.int(0, 3) * 10, len = rng.int(15, Math.min(75, 95 - from)); return withVisual(numeric(`rr-${from}-${len}`, "w11-l8.ruler", "Hur långt är föremålet (markerat) i millimeter?", len, `Längd = slut − början = ${(from + len) / 10} − ${from / 10} = ${len / 10} cm = ${len} mm.`, ["Slut minus början."], "mm"), { type: "ruler", cm: 10, from, to: from + len }); } },
     { id: "lineMm", skill: "w11-l8.line", gen: (rng) => { const k = rng.int(2, 18); return numberlineEx(`lm-${k}`, "w11-l8.line", `Tallinjen är graderad i mm. Markera ${dcTrim(k * 5, 1)} cm.`, k * 5, { min: 0, max: 100, step: 5, labelEvery: 20, unit: "mm" }, `${dcTrim(k * 5, 1)} cm = ${k * 5} mm.`, ["1 cm = 10 mm."]); } },
   ],
   teacher: {
