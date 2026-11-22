@@ -14,7 +14,10 @@ function inline(text: string): ReactNode[] {
     if (p.startsWith("$") && p.endsWith("$") && p.length > 2) out.push(math(p.slice(1, -1), i));
     else p.split(/(\*\*[^*]+\*\*)/g).forEach((q, j) => {
       if (q.startsWith("**") && q.endsWith("**") && q.length > 4) out.push(<strong key={`${i}-${j}`}>{q.slice(2, -2)}</strong>);
-      else if (q) out.push(<Fragment key={`${i}-${j}`}>{q}</Fragment>);
+      else if (q) q.split(/(\*[^*\n]+\*)/g).forEach((r, k) => {
+        if (r.length > 2 && r.startsWith("*") && r.endsWith("*")) out.push(<em key={`${i}-${j}-${k}`}>{r.slice(1, -1)}</em>);
+        else if (r) out.push(<Fragment key={`${i}-${j}-${k}`}>{r}</Fragment>);
+      });
     });
   });
   return out;
@@ -27,7 +30,7 @@ export function Rich({ text, className = "" }: { text: string; className?: strin
     <div className={`prose-m ${className}`}>
       {blocks.map((b, i) => {
         const lines = b.split("\n");
-        if (lines.every((l) => l.startsWith("- "))) return <ul key={i} className="my-2 list-disc space-y-1 pl-5 text-[#dfe5f3]">{lines.map((l, j) => <li key={j}>{inline(l.slice(2))}</li>)}</ul>;
+        if (lines.every((l) => l.startsWith("- "))) return <ul key={i} className="my-2 list-disc space-y-1 pl-5 text-ink2">{lines.map((l, j) => <li key={j}>{inline(l.slice(2))}</li>)}</ul>;
         if (/^\d+\. /.test(b)) return <p key={i}>{inline(b)}</p>;
         return <p key={i}>{lines.map((l, j) => <Fragment key={j}>{j > 0 && <br />}{inline(l)}</Fragment>)}</p>;
       })}

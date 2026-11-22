@@ -24,21 +24,21 @@ export default function WorkspacePage() {
     <div className="pb-6">
       <PageHeader title="Räkneyta" subtitle="Rita med fingret eller räkna i strukturerad uppställning." back={{ href: "/profil", label: "Profil" }} />
       <div className="space-y-4 px-5">
-        <div className="grid grid-cols-2 gap-2">{([["free", "✏️ Frihand"], ["column", "🔢 Uppställning"]] as const).map(([m, l]) => <button key={m} className={`btn ${mode === m ? "btn-gold" : "btn-ghost"}`} onClick={() => setMode(m)}>{l}</button>)}</div>
+        <div className="grid grid-cols-2 gap-2">{([["free", "Frihand"], ["column", "Uppställning"]] as const).map(([m, l]) => <button key={m} className={`btn ${mode === m ? "btn-gold" : "btn-ghost"}`} onClick={() => setMode(m)}>{l}</button>)}</div>
         {mode === "free" ? (
           <>
-            <div className="flex gap-1.5 overflow-x-auto pb-1">{PRESETS.map(([p, l]) => <button key={p} className={`shrink-0 rounded-full px-3.5 py-2 text-sm ${preset === p ? "bg-[#e8b64a] text-black" : "bg-[#182848]"}`} onClick={() => setPreset(p)}>{l}</button>)}</div>
+            <div className="flex gap-1.5 overflow-x-auto pb-1">{PRESETS.map(([p, l]) => <button key={p} className={`shrink-0 rounded-full px-3.5 py-2 text-sm ${preset === p ? "bg-hl text-onhl" : "bg-paper2"}`} onClick={() => setPreset(p)}>{l}</button>)}</div>
             <Workspace key={preset} preset={preset} storageKey={`free-${preset}`} height={440} />
           </>
         ) : (
           <div className="card space-y-4 p-5">
             <div className="flex gap-2">{([["add", "+"], ["sub", "−"], ["mul", "·"]] as const).map(([o, l]) => <button key={o} className={`btn flex-1 ${op === o ? "btn-gold" : "btn-ghost"}`} onClick={() => { setOp(o); setAns(undefined); setRes(null); }}>{l}</button>)}</div>
             <div className="flex gap-2"><input className="field" inputMode="numeric" value={a} onChange={(e) => { setA(e.target.value.replace(/\D/g, "").slice(0, 5)); setAns(undefined); setRes(null); }} aria-label="Första talet" /><input className="field" inputMode="numeric" value={b} onChange={(e) => { setB(e.target.value.replace(/\D/g, "").slice(0, 4)); setAns(undefined); setRes(null); }} aria-label="Andra talet" /></div>
-            {!valid && <p className="text-sm text-[#ef6a6a]">Vid subtraktion måste första talet vara minst lika stort.</p>}
+            {!valid && <p className="text-sm text-bad">Vid subtraktion måste första talet vara minst lika stort.</p>}
             {ex && <ExerciseView key={`${op}${na}${nb}`} spec={{ ...ex.spec, prompt: "Ställ upp och räkna. Skriv minnessiffror, växlingar och delprodukter." }} value={ans ?? emptyAnswer(ex.spec)} onChange={setAns} />}
             {ex && <button className="btn btn-gold w-full" onClick={() => setRes(gradeExercise(ex, ans))}>Kontrollera metod och svar</button>}
             {res && <Feedback result={res} />}
-            <p className="text-xs text-[#8d99b3]">Här bedöms både ditt svar och dina mellansteg. Övningen ger ingen XP.</p>
+            <p className="text-xs text-muted">Här bedöms både ditt svar och dina mellansteg. Övningen ger ingen XP.</p>
           </div>
         )}
       </div>
