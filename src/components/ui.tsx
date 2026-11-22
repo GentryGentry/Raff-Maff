@@ -66,3 +66,32 @@ export function ToastHost() {
 export function Spinner({ label = "Laddar …" }: { label?: string }) {
   return <div className="flex items-center justify-center gap-3 p-10 text-muted"><span className="h-5 w-5 animate-spin rounded-full border-2 border-ink border-t-transparent" />{label}</div>;
 }
+
+type ThemeChoice = "auto" | "light" | "dark";
+const THEME_COLOR = { light: "#FBFCFE", dark: "#10162B" };
+/** Val av ljust eller mörkt läge. "Auto" följer telefonens inställning. Valet sparas i webbläsaren. */
+export function ThemeSwitch() {
+  const [choice, setChoice] = useState<ThemeChoice>("auto");
+  useEffect(() => {
+    try { const t = localStorage.getItem("rm-theme"); if (t === "light" || t === "dark") setChoice(t); } catch { /* ignore */ }
+  }, []);
+  const apply = (c: ThemeChoice) => {
+    setChoice(c);
+    try { if (c === "auto") localStorage.removeItem("rm-theme"); else localStorage.setItem("rm-theme", c); } catch { /* ignore */ }
+    const root = document.documentElement;
+    if (c === "auto") delete root.dataset.theme; else root.dataset.theme = c;
+    const metas = document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]');
+    metas.forEach((m, i) => {
+      if (c === "auto") { m.content = i === 0 ? THEME_COLOR.light : THEME_COLOR.dark; m.media = i === 0 ? "(prefers-color-scheme: light)" : "(prefers-color-scheme: dark)"; }
+      else { m.content = THEME_COLOR[c]; m.removeAttribute("media"); }
+    });
+  };
+  const opts: [ThemeChoice, string][] = [["auto", "Auto"], ["light", "Ljust"], ["dark", "Mörkt"]];
+  return (
+    <div role="group" aria-label="Utseende" className="grid grid-cols-3 gap-2">
+      {opts.map(([v, label]) => (
+        <button key={v} type="button" aria-pressed={choice === v} onClick={() => apply(v)} className={`btn ${choice === v ? "btn-gold" : "btn-ghost"}`}>{label}</button>
+      ))}
+    </div>
+  );
+}

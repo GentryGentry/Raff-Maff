@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Bar, PageHeader, Pill, Spinner } from "@/components/ui";
+import { Bar, PageHeader, Pill, Spinner, ThemeSwitch } from "@/components/ui";
 import { useAppState } from "@/lib/client/state";
 import { WORLDS } from "@/lib/content";
 import { MASTERY_LABEL, SECTION_NAME, titleOf } from "@/lib/client/labels";
@@ -43,6 +43,8 @@ export default function Profile() {
         <section className="card p-5"><div className="mb-2 font-semibold">Vanliga misstag</div>{state.weak.length ? state.weak.map((w) => <div key={w.skill} className="flex justify-between py-1 text-sm"><span>{titleOf(w.lessonId)} · {w.skill.split(".")[1]}</span><span className="text-bad">{w.wrong}/{w.total}</span></div>) : <p className="text-sm text-muted">Inga mönster ännu.</p>}</section>
 
         <section className="card p-5"><div className="mb-2 font-semibold">Senaste prov</div>{state.attempts.length ? state.attempts.slice(0, 8).map((a) => <div key={a.id} className="flex justify-between border-b border-rule py-1.5 text-sm last:border-0"><span>{SECTION_NAME[a.section] ?? a.section} · <span className="text-muted">{titleOf(a.lessonId)}</span></span><span className={a.passed ? "text-ok" : "text-bad"}>{a.max ? Math.round((a.score / a.max) * 100) : 0}%</span></div>) : <p className="text-sm text-muted">Inga prov än.</p>}</section>
+
+        <section className="card space-y-3 p-5"><div className="font-semibold">Utseende</div><ThemeSwitch /><p className="text-xs text-muted">Auto följer telefonens inställning för ljust eller mörkt läge. Ditt val sparas på den här enheten.</p></section>
 
         <section className="card space-y-2 p-5"><div className="font-semibold">Verktyg</div>
           <Link className="btn btn-ghost w-full" href="/arbetsyta">Räkneyta och ritverktyg</Link>

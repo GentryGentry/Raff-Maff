@@ -28,9 +28,13 @@ export const viewport: Viewport = {
   width: "device-width", initialScale: 1, maximumScale: 1, viewportFit: "cover", themeColor: "var(--paper)",
 };
 
+/** Sätter valt läge innan sidan målas, så att det inte blinkar. */
+const THEME_BOOT = `try{var t=localStorage.getItem("rm-theme");if(t==="light"||t==="dark"){document.documentElement.dataset.theme=t;var c=t==="dark"?"#10162B":"#FBFCFE";document.querySelectorAll('meta[name="theme-color"]').forEach(function(m){m.setAttribute("content",c);m.removeAttribute("media")})}}catch(e){}`;
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="sv" className={`${grotesk.variable} ${mono.variable}`}>
+    <html lang="sv" className={`${grotesk.variable} ${mono.variable}`} suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} /></head>
       <body>{children}<SwRegister /></body>
     </html>
   );
